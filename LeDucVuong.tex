@@ -2120,6 +2120,14 @@ the quarter in which each institution was first flagged, and measure
 current review time. Those inputs would distinguish the staffing cost of
 additional alerts from the value of earlier detection.
 
+\textbf{Staffing the queue.} At the study's illustrative two hours per
+review, quarterly queues of 25, 35 and 50 cases require 50, 70 and 100
+staff-hours, respectively. The 20+5 allocation stays within the 25-case
+budget. A domestic pilot should record review time separately for newly
+flagged banks and repeat alerts. Those measurements would show whether
+reallocating slots changes staff workload even when the case budget
+stays fixed.
+
 Annual AP needs the event support reported in Appendix F. Recent OOT has
 no positive quarter in 2021 and only nine in 2024. A dashboard should
 report the positive count and leave AP undefined for a year with zero
@@ -2759,6 +2767,15 @@ Correct reviews count alerts on positive bank--quarters. Banks hit
 counts each institution once if an alert falls inside any of its
 positive quarters.
 
+\textbf{Marginal review burden.} In Crisis, moving from Top 25 to Top 35
+required about 1.15 additional false alerts per extra bank detected
+(60/52). The move from Top 35 to Top 50 required 2.79 (131/47). In
+Recent OOT, the two expansions added 453 and 682 false alerts,
+respectively, with 44 of 53 banks detected at all three budgets. They
+produced seven and eight more correct bank--quarter reviews,
+respectively. Row-level gains can therefore coexist with unchanged
+institutional coverage.
+
 \newpage
 
 \fontsize{11.6pt}{14.1pt}\selectfont
@@ -2936,11 +2953,12 @@ Polars 2.1.0, scikit-learn 1.9.0, LightGBM 4.7.0, PyArrow 26.0.1, joblib
 \section{References}\label{references}
 
 Phase 0 uses exactly the 26 sources R01--R26. Historical design
-references {[}H{]} and other sources follow.
+references {[}H{]} and other sources follow. AI-use disclosure
+{[}9{]}.\footnote{\fontsize{8.5bp}{10.2bp}\selectfont OpenAI ChatGPT and Codex (2026) were used to assist with code development, debugging, methodological discussions, experimental design, result interpretation, report editing, and documentation. Empirical results were obtained from the executed research notebooks. The author remains responsible for the methodology, verification of results, and final submitted content.}
 
 \begin{multicols}{2}
-\fontsize{8.5bp}{9.9bp}\selectfont
-\setlength{\parskip}{1.3pt}
+\fontsize{8.5bp}{9.35bp}\selectfont
+\setlength{\parskip}{1.15pt}
 \raggedright
 \reflisting{R01}{Ekinci and Sen (2024). \href{https://link.springer.com/article/10.1007/s10614-023-10537-6}{Forecasting Bank Failure in the U.S.: A Cost-Sensitive Approach}.}
 \reflisting{R02}{Alzayed, Eskandari and Yazdifar (2023). \href{https://link.springer.com/article/10.1007/s11156-023-01158-z}{Bank failure prediction: corporate governance and financial indicators}.}

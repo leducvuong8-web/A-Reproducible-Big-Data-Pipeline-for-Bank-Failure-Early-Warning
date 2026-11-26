@@ -129,4 +129,8 @@ pandoc LeDucVuong.md --standalone --from markdown+raw_tex --to latex \
 
 [Figure assets](figures/) are supplied as PDF and PNG. `python generate_figures.py` rebuilds them from the recorded evidence, including the saved bootstrap histograms. `python verify_cost_grid.py` checks the development cost scenarios without fitting a model. The full report cites the literature, source data, and cost inputs. The [source-screening record](source_screening.md) explains which research informed the modelling choices.
 
-This is a National Economics University BFT65B final examination project. OpenAI ChatGPT/Codex assisted with evidence checks, editing, figure styling, cost-grid verification, and the reproducibility package. Model outcomes come from the archived notebook runs.
+This is a National Economics University BFT65B final examination project.
+
+## AI use
+
+OpenAI ChatGPT and Codex (2026) were used to assist with code development, debugging, methodological discussions, experimental design, result interpretation, report editing, and documentation. Empirical results were obtained from the executed research notebooks. The author remains responsible for the methodology, verification of results, and final submitted content.

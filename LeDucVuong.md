@@ -765,6 +765,8 @@ For a domestic pilot I would record queue size, false alerts, newly detected ban
 
 **Actions and measurement.** In the recorded fixed-cut results, 1,712 of 7,978 Crisis alerts were correct and 132 of 1,757 Recent OOT alerts were correct. A supervisor therefore needs counts of reviewable cases and unique institutions alongside ranking metrics. For a Vietnam pilot I would set a review capacity before selecting a policy, record the quarter in which each institution was first flagged, and measure current review time. Those inputs would distinguish the staffing cost of additional alerts from the value of earlier detection.
 
+**Staffing the queue.** At the study's illustrative two hours per review, quarterly queues of 25, 35 and 50 cases require 50, 70 and 100 staff-hours, respectively. The 20+5 allocation stays within the 25-case budget. A domestic pilot should record review time separately for newly flagged banks and repeat alerts. Those measurements would show whether reallocating slots changes staff workload even when the case budget stays fixed.
+
 Annual AP needs the event support reported in Appendix F. Recent OOT has no positive quarter in 2021 and only nine in 2024. A dashboard should report the positive count and leave AP undefined for a year with zero positives. In a low-event environment, this matters more for interpretation than a smoother annual chart.
 
 ## Reproducibility
@@ -1040,6 +1042,8 @@ The F3 cut minimizes this recorded grid only at avoidable-loss shares of about 0
 
 Correct reviews count alerts on positive bank–quarters. Banks hit counts each institution once if an alert falls inside any of its positive quarters.
 
+**Marginal review burden.** In Crisis, moving from Top 25 to Top 35 required about 1.15 additional false alerts per extra bank detected (60/52). The move from Top 35 to Top 50 required 2.79 (131/47). In Recent OOT, the two expansions added 453 and 682 false alerts, respectively, with 44 of 53 banks detected at all three budgets. They produced seven and eight more correct bank–quarter reviews, respectively. Row-level gains can therefore coexist with unchanged institutional coverage.
+
 \newpage
 
 \fontsize{11.6pt}{14.1pt}\selectfont
@@ -1124,12 +1128,12 @@ be8f1b5c5c2a7bf5883ae38bcaf22b4706805425c32fa7e963b7880dfba6314c
 
 # References
 
-Phase 0 uses exactly the 26 sources R01–R26. Historical design references [H] and other sources follow.
+Phase 0 uses exactly the 26 sources R01–R26. Historical design references [H] and other sources follow. AI-use disclosure [9].\footnote{\fontsize{8.5bp}{10.2bp}\selectfont OpenAI ChatGPT and Codex (2026) were used to assist with code development, debugging, methodological discussions, experimental design, result interpretation, report editing, and documentation. Empirical results were obtained from the executed research notebooks. The author remains responsible for the methodology, verification of results, and final submitted content.}
 
 ```{=latex}
 \begin{multicols}{2}
-\fontsize{8.5bp}{9.9bp}\selectfont
-\setlength{\parskip}{1.3pt}
+\fontsize{8.5bp}{9.35bp}\selectfont
+\setlength{\parskip}{1.15pt}
 \raggedright
 \reflisting{R01}{Ekinci and Sen (2024). \href{https://link.springer.com/article/10.1007/s10614-023-10537-6}{Forecasting Bank Failure in the U.S.: A Cost-Sensitive Approach}.}
 \reflisting{R02}{Alzayed, Eskandari and Yazdifar (2023). \href{https://link.springer.com/article/10.1007/s11156-023-01158-z}{Bank failure prediction: corporate governance and financial indicators}.}
