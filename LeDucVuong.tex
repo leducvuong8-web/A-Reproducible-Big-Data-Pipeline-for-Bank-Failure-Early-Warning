@@ -1990,102 +1990,103 @@ Impurity importance reflects tree splits and can assign importance
 unevenly across correlated fields. Appendix D records the leading
 features.
 
-\subsubsection{5.4.1 Pilot scope, data and
-outcome}\label{pilot-scope-data-and-outcome}
+\subsubsection{5.4.1 Access, cohort and validity of the
+outcome}\label{access-cohort-and-validity-of-the-outcome}
 
-\textbf{Decision and scope.} I propose a quarterly pilot for an off-site
-supervision team at the State Bank of Vietnam (SBV), initially covering
-domestic commercial banks with comparable reporting histories that are
-still eligible for a first special-control decision. At each scoring
-date, the team would rank banks for closer review over the next four
-quarters. The proposed primary outcome is the first dated decision
-placing a bank under special control, subject to access to a complete
-event register and agreement on the coding rules with supervisors
-{[}S19{]}. The endpoint measures a supervisory decision, so the backtest
-should record changes in the rules that govern that decision. Record
-early intervention, liquidity support, restructuring and ordinary
-mergers separately. If the primary outcome is too rare to validate, test
-a separately named early-intervention outcome and report its own
-results. Exclude ambiguous exits and incomplete follow-up from the
-primary evaluation and report their counts. Use the public filings of
-listed banks to check data mapping if supervisory returns are
-unavailable and reserve outcome validation for the authorized data.
+\textbf{Start with a public-data prototype.} The proposed user is the
+State Bank of Vietnam (SBV) off-site supervision team, reviewing
+domestic commercial banks each quarter. I would first use dated
+statements from listed banks to check identifier linkage, publication
+lags and ratio definitions. Public filings can demonstrate the workflow
+within the listed cohort. Article 7 of the SBV's special-control
+regulation leaves the scope and timing of disclosure to the competent
+authority {[}S20{]}. A missing public notice therefore leaves the
+outcome unknown. The study has neither an authorized supervisory extract
+nor a complete domestic event count. Domestic recall and the feasibility
+of supervised training remain unverified.
 
-\textbf{Reconstruct each scoring date.} Link supervisory returns to a
-stable bank ID and a dated register of licence and merger changes. For
-each filing, keep the reporting period, receipt timestamp, version and
-consolidation scope. At a historical cutoff, use the latest filing
-received by that date, tag stale or missing returns, and preserve each
-predecessor's own history. Start with auditable measures of capital,
-overdue and restructured credit, profitability, liquidity, and loan and
-deposit growth. Reconcile local definitions before computing ratios.
-Vietnamese studies of market-based default risk provide a separate
-benchmark for listed banks {[}7, 8{]}.
+\textbf{Request a minimal internal extract.} An SBV sponsor and the data
+custodian would first have to confirm the permissible use, historical
+coverage and access arrangements in writing. The request would cover
+pseudonymized bank IDs and entity histories, a short set of bank-level
+prudential fields with receipt dates and versions, and a register of
+dated supervisory decisions. A designated team could run the replay
+inside an SBV-controlled environment and release vetted aggregate
+results. Test the linkage on a small extract before requesting the full
+history. Use the latest filing actually received at each historical
+cutoff. Start with capital, asset quality and funding measures, then
+check whether they add value over a simple rule baseline (Figure 11).
+Market-based default risk offers a separate comparator for the listed
+cohort {[}7, 8{]}.
 
-\textbf{Use macro data to define scenarios.} Real GDP grew 9.95\% year
-on year in Q3 2026 and an estimated 9.01\% over nine months. By 28
-September, credit and capital mobilized grew 10.89\% and 9.78\% from
-end-2025 {[}S13{]}. October CPI was 5.09\% higher year on year, and
-average CPI was 4.57\% higher in the first ten months {[}S14{]}. The IMF
-reported a 5.3\% on-balance-sheet NPL ratio as of March 2025 {[}S15{]}.
-Use dated releases to define tests for credit expansion, funding
-pressure and deteriorating credit quality. Within each scenario, compare
-each bank with peers and its own history.
+\textbf{Audit special control before using it as a label.} Define a
+positive as first entry into special control within four quarters for a
+bank still at risk, dated by the effective date in the original
+decision. Record the legal basis and trigger. Article 162 covers
+heterogeneous paths, including unsuccessful remediation, mass
+withdrawals and sustained low capital {[}S19{]}. Two reviewers should
+independently code the original decisions, reconcile disagreements and
+separate entry from extensions, exits and later transfers. Keep cohorts
+by legal regime where definitions differ. A zero requires confirmed
+coverage and complete four-quarter follow-up. Code ambiguous dates as
+unknown and quantify how excluding those cases changes the usable
+cohort. Count distinct entering banks, uncertain cases and unlinked
+decisions by era and validation window.
 
-\subsubsection{5.4.2 From backtest to a supervisory review
-queue}\label{from-backtest-to-a-supervisory-review-queue}
-
-\textbf{Replay and set the budget.} Compare a transparent ratio-rule
-baseline, a regularized logit and a locally fitted tree model on
-chronological domestic folds. Purge the four-quarter outcome horizon
-between development and validation and reserve the latest matured window
-for one locked test. Set quarterly capacity from available analyst-hours
-and observed time per case. At the same capacity, compare the existing
-review process, Top \(K\) and a policy that reserves a few slots for
-newly flagged banks. Freeze the model and queue rule before opening the
-test.
-
-\textbf{Use the U.S. results to choose comparisons.} At 1,300 U.S.
-validation reviews, 20+5 detected 266 of 1,576 bank--folds with 911
-false alerts. Top 25 and 22+3 each detected 262, with 912 false alerts.
-The 20+5 policy gained five bank--fold detections and lost one, in F4.
-Repeat alerts fell from 49.54\% to 43.38\%. Five common detections
-arrived 1.2 quarters earlier on average.
+\textbf{Require enough events to compare policies.} Before fitting, have
+the custodian check whether comparable development and held-out windows
+contain enough distinct events to meet a pre-agreed precision target for
+bank recall and distinguish a policy gain worth acting on. In F4, one
+bank moves recall by 8.3 percentage points with 12 positives (Appendix
+E). Repeated observations from one bank provide a single entry event. As
+a planning illustration, about 40 independent positive banks give a 95\%
+Wilson recall interval about 30 percentage points wide near 50\% recall.
+Clustered events can require more. If coverage or precision falls short,
+keep special control as a case-review outcome and run a ratio-based
+queue in shadow mode. A separate early-intervention target is an option
+only after passing the same audit.
 
 \newpage
 
-\textbf{Test when expansion adds value.} In Crisis, moving from 10 to
-25, 25 to 35, and 35 to 50 quarterly reviews added 134, 52 and 47
-detected banks and 67, 60 and 131 false alerts, respectively. In Recent
-OOT, the first increase added six banks and 659 false alerts. The second
-added 453 false alerts and seven positive bank--quarter reviews, with
-unique-bank coverage unchanged at 44 of 53 (Table F1). The domestic
-pilot should therefore test both reallocation and expansion, counting
-detections at the bank level and workload at the case level.
+\subsubsection{5.4.2 Decisions for a domestic shadow
+pilot}\label{decisions-for-a-domestic-shadow-pilot}
 
-\textbf{Measure the time available for review.} In the U.S. fixed-cut
-results, 1,712 of 7,978 Crisis alerts and 132 of 1,757 Recent OOT alerts
-were correct. At the study's illustrative two hours per review, queues
-of 25, 35 and 50 require 50, 70 and 100 staff-hours per quarter. For
-domestic planning, estimate intake and follow-up time separately. A
-policy that reserves slots for new cases can change total staff time
-even when the number of reviews is fixed.
+\textbf{Set the quarterly queue by staff-hours.} At equal U.S. volume,
+20+5 detected 266 bank--folds versus 262 for Top 25 and cut repeats from
+49.54\% to 43.38\%, while losing one detection in F4. I would start with
+Top \(K\) and compare allocating up to one fifth of capacity to newly
+flagged banks. Set \(K\) from measured intake and follow-up time. For
+illustration, 12 staff-hours at two hours per case support six reviews.
+Adopt a reserve only if it brings forward first alerts or finds more
+banks within the same hours and meets a pre-agreed recall floor in
+comparable windows.
 
-\textbf{Run a shadow pilot.} A reviewer receives the bank's rank, filing
-vintage, prior alerts and the ratios driving the review. For example, if
-rapid loan growth coincides with weaker deposit growth and lower
-liquidity, the reviewer checks revisions and peer movements before
-requesting a funding breakdown. Each case ends with a dated decision to
-close, seek clarification, continue monitoring or refer through the
-existing supervisory process. Compare each policy with current practice
-at the same staff-hour budget. Record distinct banks detected and
-missed, the first-alert lead time, false alerts, repeat alerts with a
-new finding and analyst-hours. Report denominators and uncertainty by
-window. Define lead time as the quarters between the first qualifying
-alert and the recorded outcome. Track shifts in filings and score
-distributions each quarter. Use the raw score for ranking and release
-probability estimates only after testing local calibration against a
-constant prevalence forecast.
+\textbf{Keep expansion and the fixed cut separate.} Adding ten slots in
+the U.S. detected 52 additional banks with 60 more false alerts in
+Crisis, versus no additional banks with 453 more false alerts in Recent
+OOT (Table F1). Keep the local queue capped by default and add slots
+only when domestic replay shows extra coverage or earlier detection
+worth the extra staff-hours. The U.S. raw cut correctly flagged 1,712 of
+7,978 Crisis alerts and 132 of 1,757 Recent alerts. Use ranking for
+triage, estimate any absolute cut from local costs on development, and
+require acceptable workload and coverage across development windows
+before adopting it. In Recent OOT, even the calibrated U.S. forecasts
+had higher Brier loss than the prevalence benchmark. Publish local
+probability estimates only after they improve on a constant, locally
+estimated prevalence forecast (§5.3.3).
+
+\textbf{Test and act.} After the label audit passes, compare current
+practice, a ratio rule and locally fitted scores on chronological folds
+with a four-quarter purge. Freeze the selected score and policy before
+the single locked test on the latest matured window. System credit grew
+10.89\% and funding grew 9.78\% from end-2025 to 28 September 2026,
+motivating a funding-pressure scenario. Use dated GDP and CPI releases
+to group macro regimes and the IMF's March 2025 NPL estimate (5.3\%) to
+motivate a separate asset-quality check {[}S13--S15{]}. For a bank whose
+loans grow faster than deposits while liquidity weakens, the reviewer
+first checks revisions and peers, then requests a funding breakdown or
+records a referral. Log case hours, action, distinct banks hit and
+missed, first-alert lead time and follow-up findings.
 
 \fontsize{10pt}{12.77pt}\selectfont
 \setlength{\parskip}{2.9pt plus .55pt minus .3pt}
@@ -2115,11 +2116,12 @@ score cut was chosen by F3, while the cost-based choices were studied on
 development. An operational replay would need observed filing dates and
 dated versions.
 
-\textbf{Vietnam.} Advance from shadow use only after the domestic pilot
-shows earlier detection or broader coverage at the same staffing cost,
-with consistent performance across time windows and enough events to
-estimate uncertainty. Supervisors should agree on these criteria before
-testing and review every proposed change to the queue rule.
+\textbf{Vietnam.} Begin with a public-data prototype. Subject to SBV
+approval, run a capacity-capped shadow queue. Move to an outcome-based
+test only after the SBV authorizes access and the event audit
+establishes usable coverage and precision. Advance to operational use
+only if the local queue improves coverage or timing at comparable
+staffing cost.
 
 Annual AP needs the event support reported in Appendix F. Recent OOT has
 no positive quarter in 2021 and only nine in 2024. A dashboard should
@@ -3103,7 +3105,7 @@ references {[}H{]} and other sources follow. AI-use disclosure
 
 \begin{multicols}{2}
 \fontsize{8.5bp}{9.35bp}\selectfont
-\setlength{\parskip}{1.15pt}
+\setlength{\parskip}{0.55pt}
 \raggedright
 \reflisting{R01}{Ekinci and Sen (2024). \href{https://link.springer.com/article/10.1007/s10614-023-10537-6}{Forecasting Bank Failure in the U.S.: A Cost-Sensitive Approach}.}
 \reflisting{R02}{Alzayed, Eskandari and Yazdifar (2023). \href{https://link.springer.com/article/10.1007/s11156-023-01158-z}{Bank failure prediction: corporate governance and financial indicators}.}
@@ -3161,6 +3163,7 @@ references {[}H{]} and other sources follow. AI-use disclosure
 \reflisting{S17}{Apache Spark. \href{https://spark.apache.org/docs/4.1.2/sql-performance-tuning.html}{SQL performance tuning and adaptive query execution}.}
 \reflisting{S18}{FDIC (2026). \href{https://www.govinfo.gov/content/pkg/CFR-2026-title12-vol5/xhtml/CFR-2026-title12-vol5-part324.html}{Title 12 CFR §324.22, AOCI opt-out election}.}
 \reflisting{S19}{National Assembly Office of Viet Nam (2025). \href{https://datafiles.chinhphu.vn/cpp/files/vbpq/2025/9/158-vbhn-vpqh.pdf}{Consolidated Law on Credit Institutions 158/VBHN-VPQH}.}
+\reflisting{S20}{State Bank of Vietnam (2025). \href{https://datafiles.chinhphu.vn/cpp/files/vbpq/2025/6/06-vbhn-nhnn.pdf}{Consolidated special-control regulation 06/VBHN-NHNN, art. 7}.}
 \end{multicols}
 
 \end{document}
