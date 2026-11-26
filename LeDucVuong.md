@@ -776,9 +776,9 @@ The source package includes the notebooks, pinned dependencies and run instructi
 \clearpage
 
 \beginappendix
-\setlength{\parskip}{5pt plus .8pt minus .3pt}
-\renewcommand{\arraystretch}{1.16}
-\fontsize{11.8pt}{14.32pt}\selectfont
+\setlength{\parskip}{4pt plus .65pt minus .3pt}
+\renewcommand{\arraystretch}{1.10}
+\fontsize{10pt}{11.75pt}\selectfont
 
 
 # Appendix A. Acquisition and Storage Evidence
@@ -812,6 +812,10 @@ For a reproducibility check, I first compare source and formatted row counts for
 
 **Workload scope.** The Q1 query in Table A2 selects a single output quarter. A feature request for that same quarter may also need the previous four observations to evaluate growth or rolling returns. For that request I would time the full read and feature calculation, including any previous-year files. This preserves the distinction between serving selected columns and serving features with a historical lookback.
 
+**Archive scale and field coverage.** The largest quarter (1986Q1) had 18,133 reporting CERTs, compared with 4,313 in 2026Q2. Capacity planning for a historical replay should account for the peak quarter. Of the 136 selected fields, 29 crossed the 50% missingness review threshold and every field had at least one observation somewhere in the archive. The first observed quarter helps distinguish changes in reporting coverage from sporadic missing values within a reporting regime (Phase 1, cells 47 and 59).
+
+**Memory for quarterly aggregation.** The separate Phase 1 benchmark aggregates the annual Bronze files by quarter. Across three independent processes per engine, median peak resident memory was 244.051 MiB for pandas and 167.348 MiB for Polars, with median increases above the process baseline of 166.367 and 124.336 MiB. These measurements apply to the narrow quarterly aggregation (Phase 1, cell 101).
+
 \newpage
 
 # Appendix B. Data Quality and Label Audit
@@ -842,6 +846,8 @@ For a reproducibility check, I first compare source and formatted row counts for
 **Reconciliation.** The V3 rule resolves 83.3% of the originally missing V2 labels. The 14,316 labels still missing consist of 13,070 right-censored rows, 1,176 rows with pre-existing failure and 70 quarantined rows. Retaining these reason codes allows a replay to distinguish newly mature event windows from origin-date exclusions and source records requiring investigation.
 
 When refreshing the event registry, I would tabulate transitions out of each reason code alongside any change in the outcome cutoff. A later cutoff can resolve a row with an immature horizon. Changes to a quarantined record require separate evidence from the source registry.
+
+**Institution linkage.** In the independent snapshot audit, 235 CERTs covering 10,996 bank-quarters lacked an institutions match. Five matched CERTs covering 218 rows had a recorded end date before their last financial report. These discrepancies identify cases for review before using an administrative end date to define the eligible population. The counts refer to linkage across the archival panel (Phase 2, cell 364).
 
 \chart{dated_failures}{Dated failures in Phase 2 by calendar year. The shaded band marks the 2008–2012 Crisis window. The recorded 2026 scope ends in Q2. Source: Phase 2 cell 201.}{.79}
 
@@ -882,6 +888,8 @@ Phase 2 validates the input key independently before joining the event registry 
 The final as-of question needs a second artifact: receipt and revision metadata for each source report. With that artifact, I would compare the earliest permissible first alert against the verified failure date and record the scoring timestamp. After a rule change I would repeat the same boundary tests and record any affected bank–quarters by reason code.
 
 For a validation Top 25 replay, compare detections among banks eligible in both cohorts. Removing flagged rows can free review slots. The common bank set helps separate that queue effect from a change in bank support.
+
+**Field sparsity and capital transitions.** The historical scan flagged 79,921 rows across 4,086 banks with more than half of the audited financial fields missing. In the negative-equity transition audit, 908 observations lacked an observable onset and 26 had a large contemporaneous asset change flagged for accounting or restructuring review. The diagnostics record whether the history supports a transition classification and preserve the underlying rows for later analysis (Phase 2, cell 370).
 
 \newpage
 
@@ -925,6 +933,10 @@ ZSTD 50k saves 28.79% of disk space and takes 8.60 ms longer on the full scan th
 
 **Low-memory output and cluster verification.** Phase 3 §3.6.4a wrote 103 batches in 49.70 s via a driver-side partition iterator and verified 1,682,616 keys and 20 columns. A matched cluster run could measure throughput, I/O, shuffle, spill and executor RAM.
 
+**Full-archive codec check.** The full-source experiment covers 1,682,616 rows, distinct from the matched 1993-2024 layout test in Table C2. Both 50k-row-group layouts passed value-fidelity checks in all 43 calendar years. ZSTD used 354.94 MiB versus 498.23 MiB for Snappy, a 28.76% reduction. Median full scans were 62.59 and 63.15 ms, respectively (Phase 3, cell 97).
+
+**Repeated Spark actions.** The local cache test reduced the median repeated action from 339.90 to 314.52 ms across three runs, with a separate 1,178.1 ms setup cost. At those medians and assuming equal savings across repeated actions, the setup would break even after about 47 actions on the same workload (Phase 3, cell 117).
+
 \newpage
 
 # Appendix D. Feature Dictionary and Interpretation
@@ -967,6 +979,8 @@ ZSTD 50k saves 28.79% of disk space and takes 8.60 ms longer on the full scan th
 The squared equity/assets term carries another 6.50% of split importance. Its inclusion shows that the fitted trees split on two representations of the same underlying ratio. I would report permutation results by fold to see whether the combined contribution is stable across reporting periods.
 
 **Ordered inventories.** The LightGBM feature inventory is reproduced separately in the source archive. For the RF challenger, the release specification records the fitted feature order. Interest, expense and deposit fields require reporting-regime checks before domestic use. In the separate Phase 4 stability audit, three Top-40 lists shared 33 fields and had a union of 48.
+
+**Annual coverage and interpretation.** In an exploratory availability audit of 102 candidate fields over 1985-2006, 50 reached 95% coverage every year, 26 had broad coverage, 15 had moderate instability and 11 depended on the reporting regime. For example, RBCT2 was completely missing in its worst year, and more than 60% of values were missing in five years. Phase 4, cell 27, records availability patterns for reviewing inputs separately from the model feature inventories and split-importance table.
 
 \newpage
 
@@ -1018,6 +1032,16 @@ The F3 cut minimizes this recorded grid only at avoidable-loss shares of about 0
 \notetext{Source: nháp\_v2, review-allocation experiment. Changes are 20 + 5 minus Top 25. Pooled bank recall rises from 16.62\% to 16.88\%.}
 ```
 
+\tabletag{E5}{Best positive-quarter rank per bank on development OOF scores}
+| Fold | Ranks 1-25 | Ranks 26-35 | Ranks 36-50 | Ranks above 50 |
+|:--|--:|--:|--:|--:|
+| F1 | 166 | 44 | 67 | 1,070 |
+| F2 | 74 | 19 | 17 | 84 |
+| F3 | 15 | 0 | 1 | 7 |
+| F4 | 7 | 0 | 0 | 5 |
+
+Each positive bank enters one bin per fold. Ranks 26-50 include 111 banks in F1 and 36 in F2. All five F4 misses at Top 25 also miss Top 50 (Phase 5, cell 316).
+
 \newpage
 
 # Appendix F. Test Diagnostics and Robustness
@@ -1044,9 +1068,11 @@ Correct reviews count alerts on positive bank–quarters. Banks hit counts each 
 
 **Marginal review burden.** In Crisis, moving from Top 25 to Top 35 required about 1.15 additional false alerts per extra bank detected (60/52). The move from Top 35 to Top 50 required 2.79 (131/47). In Recent OOT, the two expansions added 453 and 682 false alerts, respectively, with 44 of 53 banks detected at all three budgets. They produced seven and eight more correct bank–quarter reviews, respectively. Row-level gains can therefore coexist with unchanged institutional coverage.
 
+**Timing at equal bank coverage.** In Recent OOT, both policies first flagged 34 banks in the same quarter and missed nine. The fixed cutoff led for nine banks, including two by three quarters, and Top 25 led for one bank by two quarters. The additional 594 false alerts at the fixed cutoff buy earlier review for some banks already covered (Phase 5, cell 373).
+
 \newpage
 
-\fontsize{11.6pt}{14.1pt}\selectfont
+\fontsize{10pt}{11.75pt}\selectfont
 
 ## F.2 Annual rankings, uncertainty and calibration
 
@@ -1092,9 +1118,11 @@ RF Brier improves from 0.014240 to 0.007335 in Crisis and from 0.002080 to 0.000
 
 The strict filter excludes zero positive bank–quarters. Match shares refer to the original OOF rows in each fold. The current- and prior-score AP comparison uses the same matched rows in each fold.
 
+**Calibration transfer within development.** Against historical prevalence, unweighted isotonic led in F2 (Brier skill of +5.57% vs +5.14% for recency-weighted isotonic). The weighted method led in F3 (+21.36% vs +18.02%). All six methods had negative skill against the prevalence observed in F4. The fold results show how the comparison depends on both the validation period and the prevalence benchmark (Phase 5, cell 339).
+
 \newpage
 
-\fontsize{11.8pt}{14.32pt}\selectfont
+\fontsize{10pt}{11.75pt}\selectfont
 
 # Appendix G. Reproduction Checklist
 
@@ -1122,8 +1150,15 @@ be8f1b5c5c2a7bf5883ae38bcaf22b4706805425c32fa7e963b7880dfba6314c
 
 **Audited Python 3.13.7 dependencies.** pandas 2.3.3, NumPy 2.3.3, Polars 2.1.0, scikit-learn 1.9.0, LightGBM 4.7.0, PyArrow 26.0.1, joblib 1.5.2, SciPy 1.16.3, Matplotlib 3.10.7, psutil 7.0.0 and PySpark 4.1.4.
 
+**Audit coverage.** The six pinned file-digest checks covered the Phase 2 V3 labels, the Phase 4 LightGBM model and model metadata, the Phase 5 recency-weighted forest and both calibrators. Presence checks covered the Phase 0 field handoff, data scope and bundle manifest, the financial schema and the frozen-specification file. The specification passed a separate internal digest check. Gold was audited for schema and required-field presence (Phase 5, cell 362).
+
+**Scoring and drift checks.** The scoring function expects engineered inputs and takes the latest eligible report per CERT under a 45- or 90-day release-delay scenario. It returns the raw ranking, calibrated probability and separate fixed-cutoff alert. The drift check holds training quantile bins fixed and includes missing values in their own bin. The supplied synthetic check verifies that identical inputs produce negligible PSI (Phase 5, cells 365-366).
+
 \clearpage
 
+\fontsize{11.8pt}{14.32pt}\selectfont
+\setlength{\parskip}{5pt plus .8pt minus .3pt}
+\renewcommand{\arraystretch}{1.16}
 \renewcommand{\parttag}{References}
 
 # References
