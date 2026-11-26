@@ -808,13 +808,21 @@ The source package includes the notebooks, pinned dependencies and run instructi
 
 **Storage and read-time comparisons.** In 2024, Snappy and ZSTD Parquet reduced storage by 39.0% and 51.4%, respectively, relative to the same CSV input. For the Q1 query in that year, the quarterly layout reduced the measured read time from 3.976 to 1.305 ms, a 67.2% reduction. The first comparison measures the storage effect of the file format and codec. The second measures the read-time effect of partition layout for a query restricted to one quarter.
 
-For a reproducibility check, I first compare source and formatted row counts for each partition. I verify data and manifest hashes and sort order or key uniqueness, then compare canonical source values. For read measurements, I state the requested columns, materialization and run order. If the API cache changed only for one quarter, I would compare that entire set of field batches before replacing a certified partition.
+For reproducibility, compare source and formatted row counts, verify data and manifest hashes and sort order or key uniqueness, then compare canonical source values. Report columns, materialization and run order for read timings. Before replacing a refreshed partition, compare all its field batches.
 
-**Workload scope.** The Q1 query in Table A2 selects a single output quarter. A feature request for that same quarter may also need the previous four observations to evaluate growth or rolling returns. For that request I would time the full read and feature calculation, including any previous-year files. This preserves the distinction between serving selected columns and serving features with a historical lookback.
+**Workload scope.** Table A2 times a single-quarter projection. A feature request may need the previous four observations for growth or rolling returns. Time the full read and calculation, including any previous-year files, when evaluating that workload.
 
 **Archive scale and field coverage.** The largest quarter (1986Q1) had 18,133 reporting CERTs, compared with 4,313 in 2026Q2. Capacity planning for a historical replay should account for the peak quarter. Of the 136 selected fields, 29 crossed the 50% missingness review threshold and every field had at least one observation somewhere in the archive. The first observed quarter helps distinguish changes in reporting coverage from sporadic missing values within a reporting regime (Phase 1, cells 47 and 59).
 
 **Memory for quarterly aggregation.** The separate Phase 1 benchmark aggregates the annual Bronze files by quarter. Across three independent processes per engine, median peak resident memory was 244.051 MiB for pandas and 167.348 MiB for Polars, with median increases above the process baseline of 166.367 and 124.336 MiB. These measurements apply to the narrow quarterly aggregation (Phase 1, cell 101).
+
+```{=latex}
+\par\addvspace{5pt}\noindent
+\begin{minipage}{\linewidth}\centering
+\includegraphics[width=.96\linewidth]{figures/archive_quarter_counts.pdf}\par
+\captionof*{figure}{\textbf{Figure A1.} Reporting CERTs at selected quarters and at the archival maximum. Source: Phase 1, cell 47.}
+\end{minipage}\par
+```
 
 \newpage
 
@@ -848,6 +856,10 @@ For a reproducibility check, I first compare source and formatted row counts for
 When refreshing the event registry, I would tabulate transitions out of each reason code alongside any change in the outcome cutoff. A later cutoff can resolve a row with an immature horizon. Changes to a quarantined record require separate evidence from the source registry.
 
 **Institution linkage.** In the independent snapshot audit, 235 CERTs covering 10,996 bank-quarters lacked an institutions match. Five matched CERTs covering 218 rows had a recorded end date before their last financial report. These discrepancies identify cases for review before using an administrative end date to define the eligible population. The counts refer to linkage across the archival panel (Phase 2, cell 364).
+
+**Composition of the recovered labels.** Verified mergers account for 55,754 of the 71,475 resolved rows (78.0%). Unresolved administrative exits account for another 7,514 (10.5%) and retain their review flag. The two groups distinguish documented competing events from zeros assigned under the administrative-exit policy.
+
+**Eligibility in the archival panel.** Main V3 contains 1,668,293 eligible bank-quarters, including 10,852 positives. Strict V3 removes 7,514 flagged zeros (0.45%), leaving 1,660,779 rows before W1 alignment and temporal filtering (Phase 2, cells 409 and 414).
 
 \chart{dated_failures}{Dated failures in Phase 2 by calendar year. The shaded band marks the 2008–2012 Crisis window. The recorded 2026 scope ends in Q2. Source: Phase 2 cell 201.}{.79}
 
@@ -890,6 +902,14 @@ The final as-of question needs a second artifact: receipt and revision metadata 
 For a validation Top 25 replay, compare detections among banks eligible in both cohorts. Removing flagged rows can free review slots. The common bank set helps separate that queue effect from a change in bank support.
 
 **Field sparsity and capital transitions.** The historical scan flagged 79,921 rows across 4,086 banks with more than half of the audited financial fields missing. In the negative-equity transition audit, 908 observations lacked an observable onset and 26 had a large contemporaneous asset change flagged for accounting or restructuring review. The diagnostics record whether the history supports a transition classification and preserve the underlying rows for later analysis (Phase 2, cell 370).
+
+```{=latex}
+\par\addvspace{5pt}\noindent
+\begin{minipage}{\linewidth}\centering
+\includegraphics[width=.90\linewidth]{figures/registry_validation_counts.pdf}\par
+\captionof*{figure}{\textbf{Figure B1.} Registry validation counts. Quarantine: 494 of 4,117 records (12.0\%). Phase 2, cell 308.}
+\end{minipage}\par
+```
 
 \newpage
 
@@ -937,6 +957,10 @@ ZSTD 50k saves 28.79% of disk space and takes 8.60 ms longer on the full scan th
 
 **Repeated Spark actions.** The local cache test reduced the median repeated action from 339.90 to 314.52 ms across three runs, with a separate 1,178.1 ms setup cost. At those medians and assuming equal savings across repeated actions, the setup would break even after about 47 actions on the same workload (Phase 3, cell 117).
 
+**Controlled 2024 scan of W1 inputs.** Phase 3 held 18,399 rows and the same 11 raw input columns fixed. The resulting CSV occupied 4.049 MiB and ZSTD Parquet 0.613 MiB, an 84.9% reduction. Across five warm-cache timings, the median scan fell from 9.685 to 6.335 ms. The observed ranges were 8.379-10.498 ms for CSV and 3.581-6.846 ms for Parquet. The benchmark verified the values before timing.
+
+The test measures reading and materializing the selected columns. A production W1 request also needs historical lookback and feature calculation. This distinction explains why the narrow A/B timings are reported alongside the full-source layout and matched engine results (Phase 3, cells 101-102).
+
 \newpage
 
 # Appendix D. Feature Dictionary and Interpretation
@@ -981,6 +1005,10 @@ The squared equity/assets term carries another 6.50% of split importance. Its in
 **Ordered inventories.** The LightGBM feature inventory is reproduced separately in the source archive. For the RF challenger, the release specification records the fitted feature order. Interest, expense and deposit fields require reporting-regime checks before domestic use. In the separate Phase 4 stability audit, three Top-40 lists shared 33 fields and had a union of 48.
 
 **Annual coverage and interpretation.** In an exploratory availability audit of 102 candidate fields over 1985-2006, 50 reached 95% coverage every year, 26 had broad coverage, 15 had moderate instability and 11 depended on the reporting regime. For example, RBCT2 was completely missing in its worst year, and more than 60% of values were missing in five years. Phase 4, cell 27, records availability patterns for reviewing inputs separately from the model feature inventories and split-importance table.
+
+**Cross-group redundancy.** All 17 cross-group pairs above the 0.98 absolute-correlation threshold were classified as high correlation only. For example, substituting total risk-based capital for book equity would change coverage on 62,624 rows with mismatched missingness flags (Phase 4, cell 72).
+
+**Deposit growth checks.** In the extreme-growth audit, 14 cases had prior-year deposits from 1 to 53 in source units, and nine had balances from 27,886 to 57,000. Review both small denominators and large reported balance changes (Phase 4, cell 126).
 
 \newpage
 

@@ -341,3 +341,40 @@ fig.legend(handles=[
     Line2D([], [], color=NAVY, linewidth=2, label="Observed difference"),
 ], loc="lower center", bbox_to_anchor=(.52, -.015), ncol=3, fontsize=10)
 save(fig, "validation_bootstrap")
+
+def compact_archive_bars(name, labels, counts, colors, left, height):
+    fig, ax = plt.subplots(figsize=(6.65, height))
+    fig.subplots_adjust(left=left, right=.99, top=.97, bottom=.04)
+    positions = np.arange(len(labels))
+    bars = ax.barh(positions, counts, height=.62, color=colors)
+    ax.bar_label(bars, labels=[f"{n:,}" for n in counts], padding=4,
+                 fontsize=9.3, color=NAVY)
+    ax.set_yticks(positions, labels, fontsize=9.3)
+    ax.set_xlim(0, max(counts)*1.18)
+    ax.set_ylim(len(labels)-.49, -.51)
+    ax.set_xticks([])
+    ax.tick_params(axis="y", length=0, pad=5)
+    ax.grid(False)
+    for spine in ax.spines.values():
+        spine.set_visible(False)
+    save(fig, name)
+
+
+# Phase 1, cell 47: displayed checkpoints and the archive maximum.
+compact_archive_bars(
+    "archive_quarter_counts",
+    ["1984Q1", "1986Q1 (peak)", "2005Q2", "2026Q2"],
+    [17930, 18133, 8973, 4313],
+    [MID, NAVY, MID, MID],
+    left=.20, height=.92,
+)
+
+# Phase 2, cell 308: accepted failures, accepted assistance and quarantine reasons.
+compact_archive_bars(
+    "registry_validation_counts",
+    ["Valid failure CERTs", "Assistance events",
+     "Missing CERT", "Conflicting failure dates"],
+    [3033, 590, 488, 6],
+    [NAVY, BLUE, MID, MID],
+    left=.30, height=1.18,
+)
