@@ -1,0 +1,13 @@
+/data/
+/data_raw/
+/outputs/
+/reports/
+/.venv/
+.ipynb_checkpoints/
+__pycache__/
+*.parquet
+*.joblib
+*.aux
+*.log
+*.out
+*.xdv
