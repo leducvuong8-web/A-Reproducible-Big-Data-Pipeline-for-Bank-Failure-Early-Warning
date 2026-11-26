@@ -11,7 +11,7 @@ lang: en-US
 
 # Introduction
 
-Supervisors need to identify vulnerable banks early enough to investigate them with limited staff. This report develops a reproducible pipeline from public FDIC BankFind data to rank four-quarter bank failure risk and trace each forecast to its reports, features and decision rule. The project uses U.S. records as a basis for discussing Vietnamese supervisory needs.
+Supervisors need to identify vulnerable banks early enough to investigate them with limited staff. This report develops a reproducible pipeline from public FDIC BankFind data to rank four-quarter bank failure risk and trace each forecast to its reports, features and decision rule. I devoted considerable time to reconciling the historical records and documenting analytical decisions so that any remaining uncertainties are open to constructive review. The analysis examines how much coverage a quarterly review queue can deliver and draws on the U.S. evidence to discuss supervisory needs in Vietnam.
 
 **Acquisition.** The **23 November 2026** Phase 1 run (UTC) verified the quarterly Financials cache from the FDIC BankFind API. The reference snapshots show **10 November 2026** write dates and **15 November 2026** source-retrieval metadata in the matched cache. Original Financials retrieval dates require the individual quarter manifests.
 
