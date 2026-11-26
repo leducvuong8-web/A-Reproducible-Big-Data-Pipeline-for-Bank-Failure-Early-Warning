@@ -96,31 +96,31 @@ Create a local `data/` directory before Phase 0. Keep source snapshots, generate
 
 | Order | Notebook | Checkpoint |
 | --- | --- | --- |
-| 0 | [Field contract](notebooks/00_phase0_FULL_HISTORY_AUDITED_V3.ipynb) | Validate the 26-study matrix and saved field handoff. |
-| 1 | [Acquisition and Bronze](notebooks/01_phase1_CONSOLIDATED_FULL_HISTORY.ipynb) | Use `RUN_SCOPE='full'`. Check 170 quarters, both references, and the `FULL_SCOPE_PASS` handoff. |
-| 2 | [Silver and V3 labels](notebooks/Phase2_FDIC_REORGANIZED_V3_PHASE3_HANDOFF.ipynb) | Check the Silver digest, target rule, eligibility, and Phase 2 → 3 handoff. |
-| 3 | [Processing and engine parity](notebooks/Phase3_ALIGNED_PHASE2_V3_REORGANIZED_PHASE4_HANDOFF.ipynb) | Verify upstream digests, W1 output, and the Phase 3 → 4 manifest. Enable the Spark path for parity. |
-| 4–5 | [Features, modelling, and evaluation](notebooks/nh%C3%A1p_v2.ipynb) | Run Phase 4 through §4.9F. Continue at §5.0A in the same kernel. Use development through §5.3D. |
+| 0 | [Field contract](notebooks/phase%200.ipynb) | Validate the 26-study matrix and saved field handoff. |
+| 1 | [Acquisition and Bronze](notebooks/phase%201.ipynb) | Use `RUN_SCOPE='full'`. Check 170 quarters, both references, and the `FULL_SCOPE_PASS` handoff. |
+| 2 | [Silver and V3 labels](notebooks/phase%202.ipynb) | Check the Silver digest, target rule, eligibility, and Phase 2 → 3 handoff. |
+| 3 | [Processing and engine parity](notebooks/phase%203.ipynb) | Verify upstream digests, W1 output, and the Phase 3 → 4 manifest. Enable the Spark path for parity. |
+| 4–5 | [Features, modelling, and evaluation](notebooks/phase%204-5.ipynb) | Run Phase 4 through §4.9F. Continue at §5.0A in the same kernel. Use development through §5.3D. |
 
-The merged notebook records an optional Gold export reuse check failing on mismatched digests in cell 294. Cell 297 verifies the same-kernel Gold path used for the report. A new file-backed run requires a fresh release directory or a correctly matched Gold pair. Preserve hash validation. To inspect the submitted test, read the saved output in cells 332–334. The Phase 5 seed is **4903** and the MLlib demo uses **42**. The [evidence map](notebook_evidence.md) locates the saved comparisons. A complete replay requires the matching data and a configured environment.
+The report cites the merged notebook under its archived name, `nháp_v2`. The notebook records an optional Gold export reuse check failing on mismatched digests in cell 294. Cell 297 verifies the same-kernel Gold path used for the report. A new file-backed run requires a fresh release directory or a correctly matched Gold pair. Preserve hash validation. To inspect the submitted test, read the saved output in cells 332–334. The Phase 5 seed is **4903** and the MLlib demo uses **42**. The [evidence map](notebook_evidence.md) locates the saved comparisons. A complete replay requires the matching data and a configured environment.
 
 ### Build the report and check the figures
 
-The [final report](final.pdf) contains 20 main pages, nine appendix pages, and one references page. Its editable source is [nháp.md](nh%C3%A1p.md) and the generated standalone source is [nháp.tex](nh%C3%A1p.tex). With XeLaTeX and Latin Modern installed, run:
+The [final report](final.pdf) contains 20 main pages, nine appendix pages, and one references page. Its editable source is [final.md](final.md) and the generated standalone source is [final.tex](final.tex). With XeLaTeX and Latin Modern installed, run:
 
 ```sh
-xelatex -interaction=nonstopmode -halt-on-error -jobname=final nháp.tex
-xelatex -interaction=nonstopmode -halt-on-error -jobname=final nháp.tex
+xelatex -interaction=nonstopmode -halt-on-error -jobname=final final.tex
+xelatex -interaction=nonstopmode -halt-on-error -jobname=final final.tex
 ```
 
 After changing the Markdown or [preamble](preamble.tex), regenerate the TeX with Pandoc before compiling:
 
 ```sh
-pandoc nháp.md --standalone --from markdown+raw_tex --to latex \
+pandoc final.md --standalone --from markdown+raw_tex --to latex \
   --no-highlight --metadata title="" -V mainfont="Latin Modern Roman" \
   -V monofont="Latin Modern Mono" -V sansfont="Latin Modern Sans" \
   -V papersize=a4 -V fontsize=12pt -V geometry="top=17mm,bottom=16mm,left=19mm,right=19mm" \
-  -V colorlinks=true -V lang=en-US -H preamble.tex -o nháp.tex
+  -V colorlinks=true -V lang=en-US -H preamble.tex -o final.tex
 ```
 
 [Figure assets](figures/) are supplied as PDF and PNG. `python generate_figures.py` rebuilds them from the recorded evidence, including the saved bootstrap histograms. `python verify_cost_grid.py` checks the development cost scenarios without fitting a model. The full report cites the literature, source data, and cost inputs. The [source-screening record](source_screening.md) explains which research informed the modelling choices.
