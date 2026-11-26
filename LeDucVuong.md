@@ -59,14 +59,14 @@ The evidence addresses three questions about storing and processing the reports,
 
 **Five implementation phases.** Phase 1 acquires and stores data after the Phase 0 field audit. Phase 2 checks quality and constructs the panel and labels. Phase 3 tests Polars, pandas and PySpark transformations. Phase 4 engineers features and joins labels. Phase 5 fits, validates and evaluates the models.
 
-**Answers in brief.** For Q1, Snappy Parquet reduced stored size by **47.99%** across five benchmark years. On matching 2024 features, Polars, pandas and local Spark took **120.65, 155.20 and 1,686.02 ms** at the median. For Q2, I used calendar-exact histories, separate exit reasons and a mature four-quarter label. I report source-vintage limitations. For Q3, recency-weighted RF achieves **AP 0.63361** and **278/487** banks detected in Crisis at Top 25 per quarter. In Recent OOT, it reaches **AP 0.37201** and **44/53** banks. Precision and recall track correct alert rows, bank recall tracks institutional coverage, and false alerts and Brier score measure review burden and probability error.
+**Answers in brief.** For Q1, Snappy Parquet reduced stored size by **47.99%** across five benchmark years. On matching 2024 features, Polars, pandas and local Spark took **120.65, 155.20 and 1,686.02 ms** at the median. For Q2, I used calendar-exact histories, separate exit reasons and a mature four-quarter label. A prior-quarter OOF score proxy illustrates the operational cost of delayed information. For Q3, recency-weighted RF achieves **AP 0.63361** and **278/487** banks detected in Crisis at Top 25 per quarter. In Recent OOT, it reaches **AP 0.37201** and **44/53** banks. Precision and recall track correct alert rows, bank recall tracks institutional coverage, and false alerts and Brier score measure review burden and probability error.
 
 **What is independently checked.** Source completeness is verified against API totals and bank–quarter keys. Feature validity is checked with independent implementations and forecasts that respect exact calendar gaps. Model comparisons pair the same development rows and use equal review capacity. This lets a reviewer trace a result back to the underlying data and isolate whether a difference came from the source, a transformation or the alarm policy.
 
 \newpage
 \setlength{\parskip}{2.9pt plus .55pt minus .3pt}
 \renewcommand{\arraystretch}{1.10}
-\fontsize{11bp}{12.45bp}\selectfont
+\fontsize{10pt}{12.77pt}\selectfont
 
 
 # 1. Data Acquisition and Storage
@@ -94,7 +94,7 @@ The archived acquisition contract covers 136 fields from a catalogue of 2,378 do
 
 **Recovery.** `acquire_quarter` checks the Raw file–manifest pair. `verify_raw` validates SHA-256, schema, date, unique keys and row count. A new quarter is staged and checked before promotion. An incomplete pair causes an explicit failure for review. The failure snapshot has tied event dates, so if its response needs splitting, the collector can partition by year and validate each total.
 
-**Evidence boundary.** The audit logs 8,835 API pages. Some older cache entries lack page-level digests. I rely on the retained quarterly hashes, totals and key checks, alongside the Raw–Bronze reconciliation. A current API refresh may introduce revised records. Appendix A gives the provenance fields needed to distinguish refreshes from an exact rerun.
+**Acquisition metadata (§2.2A).** All six checks reach 170/170: Raw files, manifests, recorded SHA-256 digests, matching field contracts, retrieval timestamps and file-write timestamps. All 8,835 logged legacy API pages have zero retained page digests and zero page retrieval timestamps. The archival snapshots and quarterly evidence are preserved. Acquisition timestamps date retrieval and storage. Verified bank-report publication dates require separate evidence. Appendix A distinguishes an API refresh from an exact replay.
 
 
 **Failure injection before the full extraction.** Phase 1 §0.2 uses synthetic API responses to exercise the same page and manifest checks as acquisition. It rejects duplicate pages and nonmonotone key order. A separate one-byte alteration to a pinned input triggers the digest gate. The three tests passed. An identical total alone would miss a duplicated bank and an omitted bank, so the collector checks both the row total and the ordered identity keys.
@@ -247,7 +247,11 @@ The construction sets the exact fourth quarter-end. It compares that date with t
 
 **Verification boundary.** Cell 374 validates an optional SHA-pinned release file and reports zero supplied timestamps in the archived run. Phase 5 uses the assignment's quarter-end V3 target. A development-only proxy replay would map each decision to the exact preceding report quarter, preserve a null when that report is absent, and tabulate scoreable rows and eligible events. A vintage replay additionally needs verified release times and dated versions, and would select only values public by the decision date.
 
+On development OOF only, Strict V3 excludes 2,271 uncertain administrative-exit observations with no positive labels removed. This subset is distinct from the 7,514 observations across 2,059 banks in the full Main V3 audit. Section 5.2 reports the label and prior-quarter score sensitivities alongside the Phase 2 availability scenarios.
+
 # 3. Scalable Processing with Polars and PySpark
+
+**Environment audit (§3.0.1A).** The audited machine uses an Intel CPU with 12 physical and 16 logical cores, 15.69 GiB RAM (1.96 GiB available at audit), Windows 11 AMD64, Python 3.13.7, pandas 2.3.3, Polars 2.1.0 and NumPy 2.3.3. Polars reports 16 threads. The configuration specifies one warm-up and three measured repetitions. This snapshot documents the audit environment. Historical benchmarks retain their recorded scope, and the evidence supports single-machine comparisons.
 
 ## 3.1 Architecture and measured workloads
 
@@ -394,7 +398,7 @@ Four joins were quicker on the eight-year scope. The window path was about 1.94�
 
 **Quantifying when setup dominates.** Phase 3 §3.10.3 varies assumed parallel fractions, worker counts and fixed costs. For the 447.12 ms local feature workload in Table 11, 500 ms in setup alone would already exceed local runtime even if computation became instantaneous. The notebook's separate Amdahl illustration uses an archived 622.76 ms local baseline and beats local wall time in only 1 of 18 simulated cases. The result supports keeping the small recurring computation on a laptop. A cluster decision needs a matched benchmark for substantially larger or simultaneous work, with setup and data movement charged to the same completed output.
 
-\fontsize{11bp}{11.7bp}\selectfont
+\fontsize{10pt}{12.77pt}\selectfont
 \setlength{\parskip}{2.2pt plus .45pt minus .3pt}
 \renewcommand{\arraystretch}{1.03}
 
@@ -464,6 +468,8 @@ Cell 294 refused to reuse an existing Gold pair linked to a different model dige
 
 
 
+Exact calendar lags establish feature ordering. The prior-quarter OOF score comparison in §5.2 quantifies the operational effect of delayed information and motivates versioned, timestamped financial reports and explicit as-of-date feature contracts.
+
 ## 4.3 Fold-local preprocessing, selection and leakage gates
 
 I use CERT and REPDTE to align records and measure grouped outcomes. Failure dates, event types, exit flags and later audit information stay outside the predictor whitelist. `p5_collect_window` restricts the development reader to TRAIN in 1985–2006. `p5_fold_data` checks chronological order between the train, purge and validation intervals.
@@ -521,6 +527,8 @@ I use logistic regression as the simple baseline. Its F1–F4 AP is 0.3249, 0.14
 The chance-ranking AP reference is the positive frequency: about 1.19% in Crisis and 0.0701% in Recent OOT. A rule that marks every Crisis origin negative reaches about 98.81% accuracy and zero recall. Average precision summarizes precision along the recall steps of the ranking. Quarter precision and recall evaluate a particular policy, while bank recall credits an institution once when at least one positive origin enters the queue. Saito and Rehmsmeier [S10] explain the role of precision–recall under severe imbalance.
 
 Brier score averages squared errors between the observed label and a probability. It answers a question that AP leaves open: whether a reported risk such as 10% behaves like a probability. I evaluate ranking and calibration separately because recalibration can change the interpretation of scores and introduce ties. A supervisor needs both the ability to order cases and the ability to explain what a probability means. Appendix F records the archived comparison and the limits of its sample.
+
+Mean fold AP gives each fold equal weight. Pooled AP would rank the combined observations. Pooled bank–fold recall sums detections and positive support over folds, and the external scorecard counts unique banks separately in each window.
 
 ### 5.1.2 Random Forest alternatives under a fixed review budget
 
@@ -587,21 +595,21 @@ I paired fixed and recency-weighted RF out-of-fold predictions by CERT and repor
 | Detected bank–folds | +15 | 5 to 17 |
 | Reduction in false alerts | +9 | −1 to 23 |
 
-The primary interval for bank recall excludes zero. The reduction in false alerts is less certain. The intervals condition on the saved predictions and measure variation across resampled quarters. I therefore select recency-weighted RF based on the development comparison and refit its 40-feature pipeline on the full TRAIN sample of 1,121,901 bank–quarters. The net gain of 15 bank–folds comes from F1. F2 loses two hits, and F3 and F4 each gain one.
+\chart{validation_bootstrap}{Paired moving-block bootstrap on validation OOF. The solid line marks the observed difference and shading gives the 95\% interval. Source: nháp\_v2 §5.2C.}{.73}
 
-\chart{validation_bootstrap}{Paired moving-block bootstrap on validation OOF. The solid line marks the observed difference and shading gives the 95\% interval. Source: nháp\_v2 §5.2C.}{.82}
+The primary interval for bank recall excludes zero. The reduction in false alerts is less certain. The intervals condition on the saved predictions and measure variation across resampled quarters. I therefore select recency-weighted RF based on the development comparison and refit its 40-feature pipeline on the full TRAIN sample of 1,121,901 bank–quarters. The net gain of 15 bank–folds comes from F1. F2 loses two hits, and F3 and F4 each gain one.
 
 ## 5.2 Alert selection and development cost analysis
 
 **Frozen score rule.** The code maximizes the $F_3$ score across raw score thresholds on F1–F3 validation OOF. The refit carries forward the recency-weighted RF cut of **0.191913**. It flags 16,855 development rows with 4,154 true alerts. The F4 transfer check gives 19 correct alerts out of 485 and hits 7 of 12 positive banks. The quarterly Top 25 queue is a separate rank-based policy.
 
-**Cost minimization.** I minimize the following function over six recorded F1–F3 cuts and a no-alert policy. $H(t)$ counts positive bank–folds with a correct alert. False alerts are counted by bank–quarter.
+**Cost minimization.** The original discrete analysis evaluates six F1–F3 cuts and a no-alert policy using the following loss function, where missed bank–folds equal $1{,}564-H(t)$. $H(t)$ counts positive bank–folds with a correct alert. False alerts are counted by bank–quarter.
 $$
 L(t)=90.54\,FP(t)+a\times1{,}995{,}500\times[1{,}564-H(t)].
 $$
 The review cost assumes two hours at USD 45.27 [5]. The failure loss is the median of four 2004 FDIC closures [6], including two zero losses. The avoidable share $a$ is a scenario parameter. The loss-estimation rationale draws on [R18].
 
-\tabletag{16}{Minimum recorded development cost by avoidable loss share}
+\tabletag{16}{Discrete-grid development cost by avoidable loss share}
 | Avoidable share | Cost-minimizing cut | False alerts / missed bank–folds | Cost (USD) |
 |--:|--:|--:|--:|
 | 0.20% | 0.23989 | 9,991 / 190 | 1,662,875.14 |
@@ -613,6 +621,41 @@ The review cost assumes two hours at USD 45.27 [5]. The failure loss is the medi
 At 0.50%, the 0.17272 cost cut saves USD 68,267 on F1–F3. On F4 it adds 56 false reviews for the same seven detections, increasing cost from USD 92,079.14 to USD 97,149.38. The external run used the F3-selected 0.191913. Appendix E gives the cost assumptions under which that cut minimizes the grid.
 
 The F4 transfer check reveals a change in the operational trade-off. All three shortlisted cuts, 0.17272, 0.191913 and 0.23989, detected seven of twelve positive banks on F4, with 522, 466 and 337 false alerts, respectively. The higher cut reduced review burden in F4, but on F1–F3 it detected 42 fewer positive bank–folds than 0.191913. With twelve positive banks in F4, I treat the comparison as sensitivity evidence and retain 0.191913 as the threshold used in the official test. A cost-based policy should specify review and missed-failure costs before threshold selection and check bank coverage and first-alert timing on development.
+
+**Exhaustive development threshold search.** On 528,577 F1–F3 OOF bank–quarters, the search compares 135,045 threshold policies under the same loss function. Table 16a gives the optima. At the reference avoidable-loss share of 0.50%, the exhaustive threshold is 0.172676646. Table 16 retains the earlier 0.17272 grid result.
+
+\tabletag{16a}{Exhaustive F1–F3 threshold sensitivity by avoidable-loss share}
+| Share | Threshold | Bank–fold recall | False alerts | Missed bank–folds | Estimated USD |
+|--:|--:|--:|--:|--:|--:|
+| 0.20% | 0.241348 | 87.85% | 9,920 | 190 | 1,656,446.80 |
+| 0.30% | 0.209241 | 89.71% | 11,622 | 161 | 2,016,082.38 |
+| 0.50% | 0.172677 | 91.88% | 14,154 | 127 | 2,548,645.66 |
+| 0.70% | 0.146885 | 93.22% | 16,621 | 106 | 2,985,526.34 |
+| 1.00% | 0.106372 | 95.27% | 22,540 | 74 | 3,517,441.60 |
+
+At 0.50%, switching from the original $F_3$ cut (0.191913302) to the exhaustive cut changes F1–F3 precision from 24.65% to 23.06%, quarter recall from 80.07% to 81.77%, and bank–fold recall from 90.54% to 91.88%. Detections rise from 1,416 to 1,437, misses fall from 148 to 127, and false alerts increase from 12,701 to 14,154. Illustrative cost falls from USD 2,626,618.54 to USD 2,548,645.66, a modeled difference of USD 77,972.88 (2.97%). In F4 both detect 7/12 banks (58.33%), while false alerts increase from 466 to 522 and illustrative cost rises from USD 92,079.14 to USD 97,149.38 (USD 5,070.24, 5.51%). The frozen release retains the original cut.
+
+### Development sensitivity to eligibility and reporting delay
+
+**Strict V3.** With unchanged F1–F4 OOF scores and the same cost-based cut, filtering 2,271 rows raises mean AP from 0.26121 to 0.28683 and mean ROC-AUC from 0.94592 to 0.94678. Fixed-cut detections stay at 1,444/1,576 bank–folds (91.62%). False alerts fall from 14,676 to 13,247 (1,429, or 9.74%), and total alerts from 18,937 to 17,508. Top-25 coverage increases from 262 to 268. This is sensitivity to evaluation eligibility. Main V3 remains primary.
+
+**Prior-quarter proxy.** Each matched development observation uses the same bank's exact preceding-quarter OOF score within its fold. The forecast origin, target and horizon stay fixed. On the matched rows, mean AP falls from 0.25589 to 0.17832 (30.31%) and mean ROC-AUC from 0.94470 to 0.93097. Fixed-cut detections fall from 1,344 to 1,289 of 1,488 bank–folds (90.32% to 86.63%). False alerts change from 12,473 to 12,323, and Top-25 coverage falls from 239 to 187. Exact filing dates and historical vintages remain unverified. Table F4 reports fold coverage.
+
+### Chronological calibration sensitivity
+
+The six-method comparison fits mappings on prior folds, ranks candidates on F2–F3 and transfers to F4, with outcome maturity enforced. Table 16b separates Brier skill against historical prevalence from skill against prevalence observed retrospectively in F4.
+
+\tabletag{16b}{Chronological calibration against two prevalence benchmarks}
+| Method | Mean historical BSS, F2–F3 | Observed BSS, F4 |
+|:--|--:|--:|
+| Raw score | −79.69% | −244.29% |
+| Historical prevalence | 0.00% | −26.55% |
+| Sigmoid | +3.54% | −43.75% |
+| Isotonic | +11.80% | −38.57% |
+| Recency-weighted sigmoid | +5.10% | −35.35% |
+| Recency-weighted isotonic | +13.25% | −27.36% |
+
+Recency-weighted isotonic leads on mean historical skill. On F4 its Brier loss is 0.00043085 versus 0.00116474 for raw scores (63.01% lower), with historical BSS of −0.64%. Its mean probability is 0.1325% versus observed prevalence of 0.0338% (3.92 times). The original §5.3B mapping was retained ahead of the §5.3D refit and freeze. Capacity ranking continues to use raw scores.
 
 ### Spark MLlib demonstration on F2
 
@@ -653,13 +696,13 @@ For Crisis, raising the quarterly quota from 25 to 35 adds 52 detected banks and
 \tabletag{18a}{External scoring sequence in the submitted notebook}
 | Step | Evidence in the run |
 |:--|:--|
-| Fit and freeze | Cell 331 reads TRAIN, fits the selector and RF and writes the manifest with a specification hash. |
-| Bind the evaluation | Cell 332 switches to external mode and routes outputs to a directory keyed by the frozen specification hash. |
-| Verify before scoring | Cell 333 checks the specification, LightGBM booster, RF challenger and calibrators against the frozen artifact digests. |
+| Fit and freeze | §5.3D reads TRAIN, fits the selector and RF and writes the manifest with a specification hash. |
+| Bind the evaluation | The next cell switches to external mode and routes outputs to a directory keyed by the frozen specification hash. |
+| Verify before scoring | §5.4A checks the specification, LightGBM booster, RF challenger and calibrators against the frozen artifact digests. |
 | Record access | The same cell requires explicit confirmation. It creates a first-access record for a new log and only accepts an existing log if its release digests match. |
-| Enforce dates and score | Cell 334 reports 157,851 Crisis rows and 249,606 Recent rows, with the maximum Recent origin on 30 June 2025. |
+| Enforce dates and score | §5.4B reports 157,851 Crisis rows and 249,606 Recent rows, with the maximum Recent origin on 30 June 2025. |
 
-The selected scorer and operating cut are tied to the release log. Cell 334 reads each scoring window once in the submitted pass and stores one prediction frame per model and window. Subsequent tables reuse those frames. The record establishes the scoring sequence for this release. Appendix G lists the freeze digest.
+The release log ties the scorer and cut to the archived primary pass. Section 5.4B stores one prediction frame per model and window for the reported results. Saved external predictions also informed supplementary diagnostics outside primary evaluation and model selection. Appendix G lists the freeze digest.
 
 ### 5.3.3 Probability calibration and ranking
 
@@ -705,7 +748,7 @@ Table F1 also shows what happens at the lower budget. Moving from 10 to 25 revie
 
 For a domestic pilot I would record queue size, false alerts, newly detected banks and the first correct alert date at each tested budget. For consecutive quarters I would also track whether a repeat alert leads to a new supervisory finding. This would show when extra review slots extend the reach of the queue and when they support follow-up on banks already detected.
 
-\fontsize{11bp}{12.45bp}\selectfont
+\fontsize{10pt}{12.77pt}\selectfont
 \setlength{\parskip}{2.9pt plus .55pt minus .3pt}
 \renewcommand{\arraystretch}{1.10}
 
@@ -713,11 +756,11 @@ For a domestic pilot I would record queue size, false alerts, newly detected ban
 
 **Q1 — Storage and scale.** Annual Snappy Parquet saved 47.99% across five benchmark years. Polars produced the matching 2024 W1 features in 120.65 ms versus 155.20 ms for pandas. The full-panel benchmark confirms that workload width changes runtime and memory. I would consider Spark scale-out once a matched deployment run shows sustained memory pressure, concurrency limits or a missed deadline.
 
-**Q2 — Data quality and temporal validity.** Phase 2 reconciles Silver with all 136 source fields and retains valid extremes. V3 resolves 71,475 missing labels and leaves 14,316 missing. The 7,514 ambiguous exits still warrant a fitted strict-cohort sensitivity. The 0- versus 45-day test changes 1,096 candidate positives. The availability audit separates observed release dates from assumed delays.
+**Q2 — Data quality and temporal validity.** Phase 2 reconciles Silver with all 136 source fields and retains valid extremes. V3 resolves 71,475 missing labels and leaves 14,316 missing. The full panel contains 7,514 ambiguous exits. The separate Strict V3 evaluation retains fixed-cut bank–fold coverage on development. The 0- versus 45-day test changes 1,096 candidate positives. The availability audit separates observed release dates from assumed delays.
 
 **Q3 — Early warning.** The paired development bootstrap supports the recency strategy at Top 25. The frozen pass gives AP 0.63361 and 278/487 banks in Crisis, and 0.37201 and 44/53 in Recent OOT. The fixed score cut was chosen by F3, while the cost-based choices were studied on development. An operational replay would need observed filing dates and dated versions.
 
-**Vietnam.** A local pilot needs date-stamped reports, stable institution identifiers and a domestic failure target. Estimate calibration and review capacity locally before using the queue in supervision.
+**Vietnam.** A domestic pilot should use date-stamped, versioned reports, stable identifiers and locally defined failure events. Prioritize quarterly Top-K ranking at a locally feasible review capacity. Treat the development cost threshold as a scenario signal and estimate investigation costs and calibration domestically. Review administrative exits and monitor PSI and probability calibration.
 
 
 **Actions and measurement.** In the recorded fixed-cut results, 1,712 of 7,978 Crisis alerts were correct and 132 of 1,757 Recent OOT alerts were correct. A supervisor therefore needs counts of reviewable cases and unique institutions alongside ranking metrics. For a Vietnam pilot I would set a review capacity before selecting a policy, record the quarter in which each institution was first flagged, and measure current review time. Those inputs would distinguish the staffing cost of additional alerts from the value of earlier detection.
@@ -726,14 +769,14 @@ Annual AP needs the event support reported in Appendix F. Recent OOT has no posi
 
 ## Reproducibility
 
-The accompanying source package includes the notebooks, pinned dependencies and run instructions. Phase 5 uses seed 4903 and MLlib uses 42. Appendix G distinguishes checks made on archived outputs from an end-to-end rebuild, which still requires local source snapshots or a documented API refresh.
+The source package includes the notebooks, pinned dependencies and run instructions. The archived audit finds 11/11 artifacts and all 11 audited packages. Six SHA-256 checks pass, and five files pass presence checks. The frozen specification digest and 126-column Gold schema pass with zero missing required fields. Phase 5 uses Python 3.13.7, seed 4903 and two parallel jobs. MLlib uses seed 42. Appendix G records the exact versions and replay requirements.
 
 \clearpage
 
 \beginappendix
 \setlength{\parskip}{5pt plus .8pt minus .3pt}
 \renewcommand{\arraystretch}{1.16}
-\fontsize{12bp}{14.8bp}\selectfont
+\fontsize{11.8pt}{14.32pt}\selectfont
 
 
 # Appendix A. Acquisition and Storage Evidence
@@ -741,7 +784,7 @@ The accompanying source package includes the notebooks, pinned dependencies and 
 \tabletag{A1}{Provenance and acceptance by archived layer}
 | Source or product | What the manifest records | Archived checks and limitations |
 |:--|:--|:--|
-| Financials Raw | Requested quarter, query, field-contract digest, retrieval and write times, row count and SHA-256 | 170 verified quarters, with some old page digests unavailable |
+| Financials Raw | Requested quarter, query, field-contract digest, retrieval and write times, row count and SHA-256 | 170 verified quarters. 0/8,835 recorded page digests or page retrieval timestamps |
 | Reference snapshots | Endpoint, source dates and data–manifest digest pair | 4,117 event and assistance rows, 27,835 institutions |
 | Bronze | Annual partition, logical types, writer version and matching source scope | 43 files, 136 fields, with values reconciled to Raw |
 | Evaluation windows | REPDTE bounds and definition of a dated failure | 465 valid dated failures in Crisis. Recent OOT spans 2014Q1 to 2025Q2 |
@@ -792,7 +835,7 @@ For a reproducibility check, I first compare source and formatted row counts for
 
 **Two observation clocks.** For 4,273 rows the financial panel ends before continued reporting can be established. The registry still provides a mature event window, so those rows can receive V3 zero. The 13,070 genuinely immature event windows keep their null label. I retain a reason code for either case, and I retain the administrative review flag on the 7,514 cases whose exit remains uncertain.
 
-**Cohort sensitivity.** The Phase 5 split audit records **4,371 fewer TRAIN rows**, **394 fewer Crisis rows** and **2,097 fewer Recent OOT rows** under the strict V3 filter. These are coverage counts. The archived scorecard uses the main cohort. A development OOF comparison can hold predictions and review rules fixed, reapply the strict filter by key, and report changes in positive-bank support and detections.
+**Cohort sensitivity.** The Phase 5 split audit records **4,371 fewer TRAIN rows**, **394 fewer Crisis rows** and **2,097 fewer Recent OOT rows** under the strict V3 filter. These are coverage counts. The archived scorecard uses the main cohort. The development OOF comparison holds predictions and the fixed operating cut constant and reapplies the strict filter by key. Table F4 reports the fold-level result.
 
 **Reconciliation.** The V3 rule resolves 83.3% of the originally missing V2 labels. The 14,316 labels still missing consist of 13,070 right-censored rows, 1,176 rows with pre-existing failure and 70 quarantined rows. Retaining these reason codes allows a replay to distinguish newly mature event windows from origin-date exclusions and source records requiring investigation.
 
@@ -999,6 +1042,8 @@ Correct reviews count alerts on positive bank–quarters. Banks hit counts each 
 
 \newpage
 
+\fontsize{11.6pt}{14.1pt}\selectfont
+
 ## F.2 Annual rankings, uncertainty and calibration
 
 \tabletag{F2}{Recency-weighted RF annual AP and positive-quarter support}
@@ -1026,14 +1071,26 @@ Correct reviews count alerts on positive bank–quarters. Banks hit counts each 
 | Recent OOT, recency-weighted RF | 0.275–0.474 | 71.79–92.70% |
 
 ```{=latex}
-\notetext{Sources: nháp\_v2 cells 335 and 339. The external bootstrap uses 150 draws by CERT. Top 1\% differs from Top 25 per quarter. AP is undefined when a year has no positives.}
+\notetext{Sources: nháp\_v2 cells 347 and 351. The external bootstrap uses 150 draws by CERT. Top 1\% differs from Top 25 per quarter. AP is undefined when a year has no positives.}
 ```
 
-\chartpair{annual_ap}{calibration_skill}{Left: annual AP. Right: Brier skill relative to the observed-prevalence baseline. Sources: nháp\_v2 cells 335 and 355.}
+\chartpair{annual_ap}{calibration_skill}{Left: annual AP. Right: Brier skill relative to the observed-prevalence baseline. Sources: nháp\_v2 cells 347 and 371.}
 
-RF Brier improves from 0.014240 to 0.007335 in Crisis and from 0.002080 to 0.000786 in Recent after isotonic calibration. Calibrated Brier skill is 37.67% in Crisis and −12.18% in Recent. I retain raw scores for ranking because calibration creates ties. The optional strict-cohort model run is disabled in the supplied output.
+RF Brier improves from 0.014240 to 0.007335 in Crisis and from 0.002080 to 0.000786 in Recent after isotonic calibration. Calibrated Brier skill is 37.67% in Crisis and −12.18% in Recent. I retain raw scores for ranking because calibration creates ties. The optional strict-cohort refit remains disabled. The Strict V3 development comparison uses the existing scores.
+
+\tabletag{F4}{Development OOF exclusion and information-delay sensitivity}
+| Fold | Strict rows excluded | Main / Strict AP | Prior-score match | AP change, prior vs current |
+|:--|--:|--:|--:|--:|
+| F1 | 1,582 | 0.47321 / 0.49920 | 90.64% | −13.80% |
+| F2 | 529 | 0.34576 / 0.41935 | 90.97% | −35.71% |
+| F3 | 73 | 0.14323 / 0.14338 | 92.72% | −52.71% |
+| F4 | 87 | 0.08263 / 0.08540 | 91.12% | −63.59% |
+
+The strict filter excludes zero positive bank–quarters. Match shares refer to the original OOF rows in each fold. The current- and prior-score AP comparison uses the same matched rows in each fold.
 
 \newpage
+
+\fontsize{11.8pt}{14.32pt}\selectfont
 
 # Appendix G. Reproduction Checklist
 
@@ -1047,7 +1104,7 @@ RF Brier improves from 0.014240 to 0.007335 in Crisis and from 0.002080 to 0.000
 | Phase 5 development | OOF, selected estimator, calibrator, freeze spec | Fold boundaries, seed 4903, preselected metrics and policy, prediction read-back |
 | Phase 5 external | Access log, scorecard and keyed predictions | Match checksums, confirm role of prior accesses, assert cutoff, preserve score outputs |
 
-**Notebook anchors.** The Phase 2 handoff records label construction, source audits and the age-policy scenarios. In `nháp_v2.ipynb`, cell 298 checks the split, cells 308–314 cover RF strategies and development bootstrap, and cells 325–327 record calibration and raw policies. The external run is recorded by cells 331–334. Cells 335–339 and 343 provide test diagnostics and importance. Cell 360 records the validation review-allocation experiment.
+**Notebook anchors.** The Phase 2 handoff records labels, source audits and age policies. In Phase 4–5, the split (index 298), RF strategies and bootstrap (308–314) and initial calibration/cut (325–327) retain their positions. Development sensitivities appear at 330, 333, 336 and 339. The original refit and external sequence (331–334 in the archived source) is now at 343–346. Original test diagnostics (335–339, 343) are now at 347–351, 355. Validation review allocation moved from 360 to 376.
 
 **Freeze and access evidence.** The refit output records the release created on 25 November 2026. Its specification SHA-256 is printed below. The run's verifier matches the spec and model components before scoring. It writes `external_test_access.json` with a first-access UTC timestamp and the bound digests. An existing log is accepted only when the recorded release digests match. The archived scoring cell shows one pass for the submitted evaluation.
 
@@ -1057,7 +1114,9 @@ be8f1b5c5c2a7bf5883ae38bcaf22b4706805425c32fa7e963b7880dfba6314c
 
 **Point-in-time evidence.** Phase 2 cell 374 records zero matched, verified bank–quarter release timestamps. Cell 387 exports a conservative proxy and delay scenarios. For a production replay, pin an actual release-date source and join by CERT and REPDTE before scoring. Preserve the as-published vintage, filing corrections and the decision timestamp.
 
-**Reproduction status.** The report builds from the source bundle and its cost grid has an independent check. The package also contains the archived notebooks with outputs. A clean full-pipeline run still needs local FDIC snapshots, regenerated handoffs and an environment check. Rebuilding with refreshed API records creates a new release with its own digests.
+**Reproduction status.** The report builds from source, and the discrete cost grid has an independent check. The read-only audit records artifact and schema integrity alongside archived notebook outputs. A full replay requires matching local FDIC snapshots and handoffs. An API refresh creates a release with separate digests.
+
+**Audited Python 3.13.7 dependencies.** pandas 2.3.3, NumPy 2.3.3, Polars 2.1.0, scikit-learn 1.9.0, LightGBM 4.7.0, PyArrow 26.0.1, joblib 1.5.2, SciPy 1.16.3, Matplotlib 3.10.7, psutil 7.0.0 and PySpark 4.1.4.
 
 \clearpage
 

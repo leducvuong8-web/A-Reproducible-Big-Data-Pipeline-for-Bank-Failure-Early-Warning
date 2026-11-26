@@ -19,8 +19,8 @@
 \setlength{\LTpost}{5pt plus 1pt}
 \setlength{\tabcolsep}{4.5pt}
 \renewcommand{\arraystretch}{1.16}
-\AtBeginEnvironment{longtable}{\fontsize{10.1bp}{12.7bp}\selectfont}
-\AtBeginDocument{\fontsize{11bp}{13.4bp}\selectfont\color{bodyink}}
+\AtBeginEnvironment{longtable}{\fontsize{9.65pt}{11.7pt}\selectfont}
+\AtBeginDocument{\fontsize{10pt}{12.77pt}\selectfont\color{bodyink}}
 \titleformat{\section}{\normalfont\fontsize{18bp}{21.5bp}\selectfont\bfseries\color{navy}}{}{0em}{}
 \titlespacing*{\section}{0pt}{10pt plus 2pt}{7pt plus 1pt}
 \titleformat{\subsection}{\normalfont\fontsize{14.6bp}{18bp}\selectfont\bfseries\color{navy}}{}{0em}{}
@@ -42,7 +42,7 @@
 \captionsetup[figure]{font={footnotesize,color=sublabel},labelfont=bf,labelsep=period,justification=justified,singlelinecheck=false,hypcap=false,skip=4pt}
 \newcommand{\parttag}{Main report}
 \newcommand{\beginappendix}{\renewcommand{\parttag}{Appendix}}
-\newcommand{\notetext}[1]{\par{\fontsize{10.3bp}{13bp}\selectfont\itshape\color{sublabel}#1\par}}
+\newcommand{\notetext}[1]{\par{\fontsize{9.6pt}{11.6pt}\selectfont\itshape\color{sublabel}#1\par}}
 \newcommand{\reporttitle}[1]{%
   \pdfbookmark[0]{#1}{report-title}%
   \par\noindent{\raggedright\fontsize{24bp}{26.5bp}\selectfont\bfseries\color{navy}#1\par}\vspace{6pt}}
@@ -51,14 +51,14 @@
   {\fontsize{9.5bp}{12bp}\selectfont\color{sublabel}\textbf{#1}\hfill #2\par}%
   \noindent{\color{ruleblue}\rule{\linewidth}{.65pt}}\par\vspace{8pt}}
 \newcommand{\chart}[3]{%
-  \par\addvspace{8pt}\noindent
+  \par\addvspace{6pt}\noindent
   \begin{minipage}{\linewidth}\centering
     \includegraphics[width=#3\linewidth]{figures/#1.pdf}\par
     \captionof{figure}{#2}%
-  \end{minipage}\par\addvspace{8pt}}
+  \end{minipage}\par\addvspace{6pt}}
 
 \newcommand{\tabletag}[2]{%
-  \par\noindent{\fontsize{10.45bp}{13bp}\selectfont\bfseries\color{navy}Table #1. #2\par}\nopagebreak[4]}
+  \par\noindent{\fontsize{10.1pt}{11.9pt}\selectfont\bfseries\color{navy}Table #1. #2\par}\nopagebreak[4]}
 \newcommand{\chartpair}[3]{%
   \par\addvspace{6pt}\noindent
   \begin{minipage}{\linewidth}\centering

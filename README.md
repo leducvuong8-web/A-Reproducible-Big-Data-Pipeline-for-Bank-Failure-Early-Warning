@@ -2,7 +2,7 @@
 
 This BFT65B project builds and evaluates a quarterly early-warning queue for U.S. banks using public FDIC records. The target is a qualifying failure within the next four calendar quarters. The practical question is how many distinct at-risk banks a supervisor can identify with a fixed number of reviews each quarter.
 
-[Read the final report](final.pdf) · [Inspect the notebook evidence map](notebook_evidence.md) · [Set up the project](#reproduce-the-project)
+[Read the final report](LeDucVuong.pdf) · [Inspect the notebook evidence map](notebook_evidence.md) · [Set up the project](#reproduce-the-project)
 
 ![Pipeline diagram showing the FDIC source, Bronze and Silver panels, feature construction, and frozen model evaluation](figures/pipeline_architecture.png)
 
@@ -60,7 +60,9 @@ Phase 5 compares logistic regression, the frozen LightGBM incumbent, and RF vari
 
 **Threshold transfer.** Maximizing the F-score with β = 3 on F1–F3 OOF selects a raw-score cut of **0.191913**. In the F4 sensitivity check, cuts of 0.17272, 0.191913 and 0.23989 each catch **7 of 12** positive banks, with **522, 466 and 337** false alerts respectively. On F1–F3, the highest cut detects **42 fewer** positive bank–folds than the selected cut. The official test uses the frozen **0.191913** cutoff. The Top 25 policy below separately ranks banks and fixes workload at 25 reviews each quarter.
 
-**Frozen Top 25 scorecard.** The notebook verifies the release and scores each external window once in the submitted run. The capacity and calibration diagnostics reuse those prediction frames. Bank recall counts distinct institutions detected at least once on a positive forecast origin. False alerts count individual bank–quarter reviews.
+**Development sensitivity and audit.** The four supplementary comparisons use saved development OOF scores. At the 0.50% avoidable-loss assumption, an exhaustive search selects **0.172676646** on F1–F3 as a scenario threshold. The prior six-cut grid remains documented separately, and the frozen score rule remains **0.191913302**. Filtering 2,271 uncertain OOF rows increases mean AP from 0.26121 to 0.28683, with 1,444 of 1,576 bank–folds detected at the fixed cost cut in each population. Delaying scores by one quarter on matched rows reduces mean AP from 0.25589 to 0.17832. Earlier-fold calibration improves F4 Brier loss relative to raw scores, and the original calibrator remains in the archived release. Phase 1 records six complete quarterly metadata checks across 170 quarters, with no retained per-page hashes or retrieval times across 8,835 logged pages. The reproducibility audit verifies six hashes, documents five presence checks, and checks the Gold schema and frozen-specification digest.
+
+**Frozen Top 25 scorecard.** The primary archived scorecard uses the frozen release through 2025Q2. The capacity and calibration diagnostics reuse its prediction frames. External predictions were also used for supplementary diagnostics outside model selection and the primary scorecard. Bank recall counts distinct institutions detected at least once on a positive forecast origin. False alerts count individual bank–quarter reviews.
 
 | Window | Model | Raw AP | Banks detected | Bank recall | False alerts |
 | --- | --- | ---: | ---: | ---: | ---: |
@@ -79,7 +81,7 @@ Phase 5 compares logistic regression, the frozen LightGBM incumbent, and RF vari
 
 ## Reproduce the project
 
-Use Python 3.13 (3.13.7 in the archived kernel) and JDK 17 or 21 for local Spark. From the repository root, create and activate a virtual environment before installing the hash-pinned [requirements](requirements.txt). Set `JAVA_HOME` to the local JDK and choose the corresponding Python kernel in JupyterLab.
+Use Python 3.13.7, as recorded by the audit, and JDK 17 or 21 for local Spark. From the repository root, create and activate a virtual environment before installing the hash-pinned [requirements](requirements.txt). Set `JAVA_HOME` to the local JDK and choose the corresponding Python kernel in JupyterLab.
 
 ```sh
 python -m venv .venv
@@ -102,29 +104,29 @@ For schema placement, required data files, and the checkpoint that each phase pr
 | 1 | [Acquisition and Bronze](notebooks/phase%201.ipynb) | Use `RUN_SCOPE='full'`. Check 170 quarters, both references, and the `FULL_SCOPE_PASS` handoff. |
 | 2 | [Silver and V3 labels](notebooks/phase%202.ipynb) | Check the Silver digest, target rule, eligibility, and Phase 2 → 3 handoff. |
 | 3 | [Processing and engine parity](notebooks/phase%203.ipynb) | Verify upstream digests, W1 output, and the Phase 3 → 4 manifest. Enable the Spark path for parity. |
-| 4–5 | [Features, modelling, and evaluation](notebooks/phase%204-5.ipynb) | Run Phase 4 through §4.9F. Continue at §5.0A in the same kernel. Use development through §5.3D. |
+| 4–5 | [Features, modelling, and evaluation](notebooks/phase%204-5.ipynb) | Run Phase 4 through §4.9F. Continue at §5.0A in the same kernel. For development checks, use §5.3B and its OOF sensitivity cells. Use saved outputs to inspect §5.3D and later results. |
 
-The report cites the merged notebook under its archived name, `nháp_v2`. The notebook records an optional Gold export reuse check failing on mismatched digests in cell 294. Cell 297 verifies the same-kernel Gold path used for the report. A new file-backed run requires a fresh release directory or a correctly matched Gold pair. Preserve hash validation. To inspect the submitted test, read the saved output in cells 332–334. The Phase 5 seed is **4903** and the MLlib demo uses **42**. The [evidence map](notebook_evidence.md) locates the saved comparisons. A complete replay requires the matching data and a configured environment.
+The report cites the merged notebook under its archived name, `nháp_v2`. The notebook records an optional Gold export reuse check failing on mismatched digests in cell 294. Cell 297 verifies the same-kernel Gold path used for the report. A new file-backed run requires a fresh release directory or a correctly matched Gold pair. Preserve hash validation. To inspect the submitted test, read the saved output in §5.4A–B (indices 345–346). The Phase 5 seed is **4903** and the MLlib demo uses **42**. The [evidence map](notebook_evidence.md) locates the saved comparisons. A complete replay requires the matching data and a configured environment.
 
 ### Build the report and check the figures
 
-The [final report](final.pdf) contains 20 main pages, nine appendix pages, and one references page. Its editable source is [final.md](final.md) and the generated standalone source is [final.tex](final.tex). With XeLaTeX and Latin Modern installed, run:
+The [final report](LeDucVuong.pdf) contains 20 main pages, nine appendix pages, and one references page. Its editable source is [LeDucVuong.md](LeDucVuong.md) and the generated standalone source is [LeDucVuong.tex](LeDucVuong.tex). With XeLaTeX and Latin Modern installed, run:
 
 ```sh
-xelatex -interaction=nonstopmode -halt-on-error -jobname=final final.tex
-xelatex -interaction=nonstopmode -halt-on-error -jobname=final final.tex
+xelatex -interaction=nonstopmode -halt-on-error -jobname=LeDucVuong LeDucVuong.tex
+xelatex -interaction=nonstopmode -halt-on-error -jobname=LeDucVuong LeDucVuong.tex
 ```
 
 After changing the Markdown or [preamble](preamble.tex), regenerate the TeX with Pandoc before compiling:
 
 ```sh
-pandoc final.md --standalone --from markdown+raw_tex --to latex \
+pandoc LeDucVuong.md --standalone --from markdown+raw_tex --to latex \
   --no-highlight --metadata title="" -V mainfont="Latin Modern Roman" \
   -V monofont="Latin Modern Mono" -V sansfont="Latin Modern Sans" \
   -V papersize=a4 -V fontsize=12pt -V geometry="top=17mm,bottom=16mm,left=19mm,right=19mm" \
-  -V colorlinks=true -V lang=en-US -H preamble.tex -o final.tex
+  -V colorlinks=true -V lang=en-US -H preamble.tex -o LeDucVuong.tex
 ```
 
 [Figure assets](figures/) are supplied as PDF and PNG. `python generate_figures.py` rebuilds them from the recorded evidence, including the saved bootstrap histograms. `python verify_cost_grid.py` checks the development cost scenarios without fitting a model. The full report cites the literature, source data, and cost inputs. The [source-screening record](source_screening.md) explains which research informed the modelling choices.
 
-This is a National Economics University BFT65B final examination project. OpenAI ChatGPT/Codex assisted with evidence checks, editing, figure styling, rubric review, cost-grid verification, and the reproducibility package. Model outcomes come from the archived notebook runs.
+This is a National Economics University BFT65B final examination project. OpenAI ChatGPT/Codex assisted with evidence checks, editing, figure styling, cost-grid verification, and the reproducibility package. Model outcomes come from the archived notebook runs.

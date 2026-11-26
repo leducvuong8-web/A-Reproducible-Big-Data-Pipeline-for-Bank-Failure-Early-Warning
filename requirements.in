@@ -1,17 +1,17 @@
-# Python 3.13.7. Five recorded versions match the notebook outputs.
+# Audited with Python 3.13.7. See docs/data_setup.md for Java and run scope.
 pandas==2.3.3
 polars==2.1.0
 pyspark==4.1.4
 scikit-learn==1.9.0
 lightgbm==4.7.0
-# Supporting runtime pins. Original exact versions were not recovered.
-numpy==2.3.5
-pyarrow==22.0.0
-scipy==1.17.0
-joblib==1.5.3
-matplotlib==3.10.8
+# Additional direct notebook and report dependencies.
+numpy==2.3.3
+pyarrow==26.0.1
+scipy==1.16.3
+joblib==1.5.2
+matplotlib==3.10.7
 pillow==12.0.0
-psutil==7.2.2
+psutil==7.0.0
 requests==2.32.5
 pyyaml==6.0.3
 ipykernel==7.2.0
