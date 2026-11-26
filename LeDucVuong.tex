@@ -1990,94 +1990,102 @@ Impurity importance reflects tree splits and can assign importance
 unevenly across correlated fields. Appendix D records the leading
 features.
 
-\subsubsection{5.4.1 Vietnamese Supervisory
-Context}\label{vietnamese-supervisory-context}
+\subsubsection{5.4.1 Pilot scope, data and
+outcome}\label{pilot-scope-data-and-outcome}
 
-I would define the local distress event and how assistance, merger and
-restructuring enter the label. Persistent IDs would have to survive
-changes in licenses and legal entities. Reporting frequency and
-transmission dates determine actual lookback. A revision history must
-show which statement was available on a past scoring date. Given the RF
-signals, I would first reconcile classifications of problem loans,
-income, consolidated assets and capital. Vietnamese research uses
-market-based default risk to study securities returns {[}7, 8{]}. Those
-studies contextualize the discussion. Phase 4 uses accounting measures
-and the supervisory failure target.
+\textbf{Decision and scope.} I propose a quarterly pilot for an off-site
+supervision team at the State Bank of Vietnam (SBV), initially covering
+domestic commercial banks with comparable reporting histories that are
+still eligible for a first special-control decision. At each scoring
+date, the team would rank banks for closer review over the next four
+quarters. The proposed primary outcome is the first dated decision
+placing a bank under special control, subject to access to a complete
+event register and agreement on the coding rules with supervisors
+{[}S19{]}. The endpoint measures a supervisory decision, so the backtest
+should record changes in the rules that govern that decision. Record
+early intervention, liquidity support, restructuring and ordinary
+mergers separately. If the primary outcome is too rare to validate, test
+a separately named early-intervention outcome and report its own
+results. Exclude ambiguous exits and incomplete follow-up from the
+primary evaluation and report their counts. Use the public filings of
+listed banks to check data mapping if supervisory returns are
+unavailable and reserve outcome validation for the authorized data.
 
-The National Statistics Office estimated \textbf{real GDP growth of
-9.95\% year-on-year in Q3 2026} and \textbf{9.01\% over the first nine
-months} {[}S13{]}. As of \textbf{28 September 2026}, economy-wide credit
-and capital mobilized by credit institutions had increased
-\textbf{10.89\%} and \textbf{9.78\%}, respectively, relative to end-2025
-{[}S13{]}. In \textbf{October 2026}, CPI rose \textbf{5.09\%
-year-on-year}, with average CPI up \textbf{4.57\%} in the first ten
-months {[}S14{]}. The IMF's 2025 Article IV report gives a separate
-measure, an on-balance-sheet NPL ratio of \textbf{5.3\% as of March
-2025} {[}S15{]}.
+\textbf{Reconstruct each scoring date.} Link supervisory returns to a
+stable bank ID and a dated register of licence and merger changes. For
+each filing, keep the reporting period, receipt timestamp, version and
+consolidation scope. At a historical cutoff, use the latest filing
+received by that date, tag stale or missing returns, and preserve each
+predecessor's own history. Start with auditable measures of capital,
+overdue and restructured credit, profitability, liquidity, and loan and
+deposit growth. Reconcile local definitions before computing ratios.
+Vietnamese studies of market-based default risk provide a separate
+benchmark for listed banks {[}7, 8{]}.
 
-The figures motivate three supervisory checks. Credit and funding growth
-make it useful to monitor loan and deposit flows within comparable peer
-groups. Changing prices and activity call for testing assumptions about
-repayment and funding costs across regimes. The IMF asset-quality figure
-motivates tracking overdue, restructured and nonperforming exposures
-with consistent definitions. Aggregate values cannot identify which bank
-is at risk. I would preserve their release dates for scenario analysis
-or a separate domestic development benchmark.
+\textbf{Use macro data to define scenarios.} Real GDP grew 9.95\% year
+on year in Q3 2026 and an estimated 9.01\% over nine months. By 28
+September, credit and capital mobilized grew 10.89\% and 9.78\% from
+end-2025 {[}S13{]}. October CPI was 5.09\% higher year on year, and
+average CPI was 4.57\% higher in the first ten months {[}S14{]}. The IMF
+reported a 5.3\% on-balance-sheet NPL ratio as of March 2025 {[}S15{]}.
+Use dated releases to define tests for credit expansion, funding
+pressure and deteriorating credit quality. Within each scenario, compare
+each bank with peers and its own history.
 
-The consolidated Law on Credit Institutions {[}S19{]} gives the legal
-context. A pilot would define separately ordinary merger, distressed
-restructuring, special control and a qualifying failure-style event. A
-dated entity-history table would link successive identifiers while
-preserving the predecessor's own reporting history.
+\subsubsection{5.4.2 From backtest to a supervisory review
+queue}\label{from-backtest-to-a-supervisory-review-queue}
 
-\subsubsection{5.4.2 Implications for
-Vietnam}\label{implications-for-vietnam}
+\textbf{Replay and set the budget.} Compare a transparent ratio-rule
+baseline, a regularized logit and a locally fitted tree model on
+chronological domestic folds. Purge the four-quarter outcome horizon
+between development and validation and reserve the latest matured window
+for one locked test. Set quarterly capacity from available analyst-hours
+and observed time per case. At the same capacity, compare the existing
+review process, Top \(K\) and a policy that reserves a few slots for
+newly flagged banks. Freeze the model and queue rule before opening the
+test.
 
-I would measure local review capacity before choosing a budget. Where
-domestic failures are scarce, I would publish the number of banks hit
-and missed with their rates and uncertainty. I would use the quarterly
-queue to compare workloads across reporting periods and track the first
-qualifying alert separately from repeat alerts at the same bank.
+\textbf{Use the U.S. results to choose comparisons.} At 1,300 U.S.
+validation reviews, 20+5 detected 266 of 1,576 bank--folds with 911
+false alerts. Top 25 and 22+3 each detected 262, with 912 false alerts.
+The 20+5 policy gained five bank--fold detections and lost one, in F4.
+Repeat alerts fell from 49.54\% to 43.38\%. Five common detections
+arrived 1.2 quarters earlier on average.
 
-I would standardize identifiers, reporting definitions and timestamps,
-then run a chronological backtest on domestic data. Next I would
-calibrate probabilities and estimate a local policy from review costs
-and the consequences of misses.
+\newpage
 
-I would then pilot a queue in which supervisors validate underlying
-reports and record the disposition of alerts. The pilot must establish
-domestic performance before the model informs supervisory action.
+\textbf{Test when expansion adds value.} In Crisis, moving from 10 to
+25, 25 to 35, and 35 to 50 quarterly reviews added 134, 52 and 47
+detected banks and 67, 60 and 131 false alerts, respectively. In Recent
+OOT, the first increase added six banks and 659 false alerts. The second
+added 453 false alerts and seven positive bank--quarter reviews, with
+unique-bank coverage unchanged at 44 of 53 (Table F1). The domestic
+pilot should therefore test both reallocation and expansion, counting
+detections at the bank level and workload at the case level.
 
-\textbf{Allocate reviews before adding them.} The validation queue
-experiment holds 1,300 alerts fixed. Pure Top 25 and 22+3 each hit
-262/1,576 bank--folds with 912 false alerts. The 20+5 policy hits
-266/1,576 with 911 false alerts. It adds five bank--folds and loses one,
-so the net gain is four. Among common detections, five arrive an average
-of 1.2 quarters earlier, and the repeat-alert share falls from 49.54\%
-to 43.38\%. The gain comes mainly from F2, while F4 loses one detection.
+\textbf{Measure the time available for review.} In the U.S. fixed-cut
+results, 1,712 of 7,978 Crisis alerts and 132 of 1,757 Recent OOT alerts
+were correct. At the study's illustrative two hours per review, queues
+of 25, 35 and 50 require 50, 70 and 100 staff-hours per quarter. For
+domestic planning, estimate intake and follow-up time separately. A
+policy that reserves slots for new cases can change total staff time
+even when the number of reviews is fixed.
 
-\textbf{Marginal value of a larger queue.} In Crisis, expanding the
-queue from 25 to 35 reviews per quarter detects 52 additional banks at
-the cost of 60 additional false alerts. Expanding it again from 35 to 50
-detects another 47 banks and adds 131 false alerts. In Recent OOT, the
-first expansion generates 453 additional false alerts while bank
-coverage remains at 44 of 53. The observed return on expanding the queue
-therefore depends on the evaluation window.
-
-Table F1 also shows what happens at the lower budget. Moving from 10 to
-25 reviews per quarter adds 134 detected banks and 67 false alerts in
-Crisis, and six detected banks and 659 false alerts in Recent OOT. At
-Top 35 in Recent OOT, seven additional reviews fall in positive
-bank--quarters, yet the number of banks covered stays at 44. A
-supervisor can weigh those reviews using the timing of the first alert
-and the effort needed to check a bank already under review.
-
-For a domestic pilot I would record queue size, false alerts, newly
-detected banks and the first correct alert date at each tested budget.
-For consecutive quarters I would also track whether a repeat alert leads
-to a new supervisory finding. This would show when extra review slots
-extend the reach of the queue and when they support follow-up on banks
-already detected.
+\textbf{Run a shadow pilot.} A reviewer receives the bank's rank, filing
+vintage, prior alerts and the ratios driving the review. For example, if
+rapid loan growth coincides with weaker deposit growth and lower
+liquidity, the reviewer checks revisions and peer movements before
+requesting a funding breakdown. Each case ends with a dated decision to
+close, seek clarification, continue monitoring or refer through the
+existing supervisory process. Compare each policy with current practice
+at the same staff-hour budget. Record distinct banks detected and
+missed, the first-alert lead time, false alerts, repeat alerts with a
+new finding and analyst-hours. Report denominators and uncertainty by
+window. Define lead time as the quarters between the first qualifying
+alert and the recorded outcome. Track shifts in filings and score
+distributions each quarter. Use the raw score for ranking and release
+probability estimates only after testing local calibration against a
+constant prevalence forecast.
 
 \fontsize{10pt}{12.77pt}\selectfont
 \setlength{\parskip}{2.9pt plus .55pt minus .3pt}
@@ -2107,29 +2115,11 @@ score cut was chosen by F3, while the cost-based choices were studied on
 development. An operational replay would need observed filing dates and
 dated versions.
 
-\textbf{Vietnam.} A domestic pilot should use date-stamped, versioned
-reports, stable identifiers and locally defined failure events.
-Prioritize quarterly Top-K ranking at a locally feasible review
-capacity. Treat the development cost threshold as a scenario signal and
-estimate investigation costs and calibration domestically. Review
-administrative exits and monitor PSI and probability calibration.
-
-\textbf{Actions and measurement.} In the recorded fixed-cut results,
-1,712 of 7,978 Crisis alerts were correct and 132 of 1,757 Recent OOT
-alerts were correct. A supervisor therefore needs counts of reviewable
-cases and unique institutions alongside ranking metrics. For a Vietnam
-pilot I would set a review capacity before selecting a policy, record
-the quarter in which each institution was first flagged, and measure
-current review time. Those inputs would distinguish the staffing cost of
-additional alerts from the value of earlier detection.
-
-\textbf{Staffing the queue.} At the study's illustrative two hours per
-review, quarterly queues of 25, 35 and 50 cases require 50, 70 and 100
-staff-hours, respectively. The 20+5 allocation stays within the 25-case
-budget. A domestic pilot should record review time separately for newly
-flagged banks and repeat alerts. Those measurements would show whether
-reallocating slots changes staff workload even when the case budget
-stays fixed.
+\textbf{Vietnam.} Advance from shadow use only after the domestic pilot
+shows earlier detection or broader coverage at the same staffing cost,
+with consistent performance across time windows and enough events to
+estimate uncertainty. Supervisors should agree on these criteria before
+testing and review every proposed change to the queue rule.
 
 Annual AP needs the event support reported in Appendix F. Recent OOT has
 no positive quarter in 2021 and only nine in 2024. A dashboard should
