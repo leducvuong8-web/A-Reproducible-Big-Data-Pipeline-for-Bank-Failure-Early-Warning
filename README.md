@@ -94,6 +94,8 @@ python -m jupyterlab
 
 Create a local `data/` directory before Phase 0. Keep source snapshots, generated tables, and fitted model artifacts locally. The [FDIC BankFind API](https://api.fdic.gov/banks/docs/) supplies financial and institution records. [FDIC failures and assistance](https://banks.data.fdic.gov/bankfind-suite/failures) supplies event evidence. Exact historical replay requires source snapshots matching the notebook manifests. For a fresh extraction, retain the new handoffs and compare counts and digests before accepting the release.
 
+For schema placement, required data files, and the checkpoint that each phase produces, see the [data and phase handoff guide](docs/data_setup.md).
+
 | Order | Notebook | Checkpoint |
 | --- | --- | --- |
 | 0 | [Field contract](notebooks/phase%200.ipynb) | Validate the 26-study matrix and saved field handoff. |

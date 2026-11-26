@@ -1,0 +1,37 @@
+# Data and phase handoffs
+
+## Source inputs
+
+Use the Python 3.13 environment and hash-pinned dependencies in the [project README](../README.md). Run from the repository root or its `notebooks/` directory. Before Phase 0, create `data/` at the repository root. Git does not track that directory, so it does not appear in a fresh checkout.
+
+The submitted [research matrix](research_matrix.csv) contains 26 studies and is already tracked. Place any retained schema and codebook files in `docs/` alongside that matrix.
+
+| File | Role |
+|:--|:--|
+| `fdic_financial_schema.yaml` and `fdic_financial_schema.yaml.meta.json` | Phase 0 verifies the URL and SHA-256 together before reusing the cached schema. Phase 1 verifies the schema against the Phase 0 handoff. Keep both from the same snapshot. |
+| `data_dictionary.csv` | Phase 0 generates and refines this dictionary. A complete Phase 0 run rewrites it. |
+| `fdic_exit_codebook.csv` | Phase 0 can reuse this cache of exit-code definitions. If absent, it queries FDIC History. |
+| `fdic_failure_schema.yaml` and `fdic_institution_schema.yaml` | Reference definitions for the failures and institutions endpoints. The notebooks do not load these two YAML files by name. |
+
+The notebooks acquire public records from the FDIC BankFind financials, failures, institutions, and history endpoints. The schema and dictionary files describe those records. The raw snapshots and derived Parquet files are kept locally. [FDIC API documentation](https://api.fdic.gov/banks/docs/)
+
+## Start at the earliest phase for which you lack inputs
+
+Run notebooks in order. Use separate kernels for Phases 0–3, then the same kernel for Phases 4 and 5. Reuse a saved handoff only with its corresponding artifacts from the same run.
+
+| Phase | Inputs checked before use | Outputs required downstream |
+|:--|:--|:--|
+| 0 | `docs/research_matrix.csv`, a local `data/` directory, and FDIC API access for samples and reference retrieval. | `docs/phase0_artifact_bundle_manifest.json`, `phase0_data_scope_contract.json`, `phase0_phase1_field_handoff_v2.json`, `phase0_phase1_selected_fields_v2.csv`, `phase0_all_fdic_financial_fields_v2.csv`, and `phase0_ALL_field_scores_v2.csv`. |
+| 1 | The complete Phase 0 bundle and the schema/research files it pins. | Quarterly Raw, annual Bronze under `data/bronze/financials/`, FDIC failures and institutions snapshots with their manifests, and the selected `outputs/phase1_from_phase0/runs/<run>/` with `reports/phase1_to_phase2_handoff.json`. Production requires `RUN_SCOPE='full'` and `FULL_SCOPE_PASS` for 1984Q1–2026Q2. |
+| 2 | The Phase 0 bundle, full-scope Phase 1 run, and its Bronze and reference files. The notebook can acquire FDIC History. To reuse it, retain `data/reference/fdic_history_events.csv` (or a verified Parquet equivalent) with `data/reference/fdic_history_manifest.json`. | The Silver `clean_bank_quarter.parquet` and its `.manifest.json`, plus `bank_quarter_labels_event_based_v3.parquet` and `phase2_to_phase3_handoff_v3.json`. |
+| 3 | The matching Phase 2 Silver and V3 labels plus the linked Phase 0/1 lineage and annual Bronze files. | W1 features `w1_financial_features_1985Q1_2026Q2.parquet`, the production manifest, `phase3_to_phase4_handoff_v3.json`, and `outputs/phase3_refined/latest_phase4_handoff.json`. |
+| 4 | The Phase 3 pointer, production files, and matched Silver and V3 labels. | The final Top 40 checkpoint and metadata under `outputs/phase4_final40/`. The in-memory Gold path is used when Phase 5 follows in the same kernel. |
+| 5 | The Phase 4 checkpoint and same-kernel state. A separate-kernel run also needs a matching `phase4_gold_v3_native.parquet` and `phase4_to_phase5_export.json` from the same release. | For development, run through §5.3D (cell index 331). For official results, inspect the archived outputs. Running all cells would enter external scoring. |
+
+The four-quarter Phase 1 pilot (`RUN_SCOPE='pilot'`) is useful for a download smoke test in an isolated checkout. It produces `PILOT_SCOPE_PASS_ONLY`, and Phase 2 requires the full archive. In Phase 3, set `P3_CFG['run_spark'] = True` only when testing Spark parity in a configured Java environment. Phase 2 can analyze assumed publication lags without a separate vintage file. Real publication-time checks need a verified optional file with `CERT`, `REPDTE` and `PUBLIC_AVAILABLE_AT`.
+
+## Replay the reported release or rebuild from FDIC
+
+For a fresh rebuild, start at Phase 0 and let each phase produce its own data, manifests and digests. FDIC can revise source records. If an input digest or coverage gate fails, identify the matching snapshot or regenerate downstream artifacts from the verified source.
+
+To reproduce the reported release without downloading the full history, retain one complete project archive with the original `docs/`, `data/` and `outputs/` directories and their hierarchy. The first useful checkpoint is the Phase 0/1 bundle, including the same-run Bronze and FDIC reference snapshots. To start at Phase 3 or 4, the archive must also contain the corresponding Silver, V3 and W1 artifacts. A standalone Parquet without its linked manifests does not let the later phases verify lineage.
