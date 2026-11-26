@@ -1,12 +1,24 @@
-# A Reproducible Big Data Pipeline for Bank Failure Early Warning
+# ![A Reproducible Big Data Pipeline for Bank Failure Early Warning](.github/readme/hero.png)
 
 This BFT65B project builds and evaluates a quarterly early-warning queue for U.S. banks using public FDIC records. The target is a qualifying failure within the next four calendar quarters. The practical question is how many distinct at-risk banks a supervisor can identify with a fixed number of reviews each quarter.
 
-[Read the final report](LeDucVuong.pdf) · [Inspect the notebook evidence map](notebook_evidence.md) · [Set up the project](#reproduce-the-project)
+<p align="center">
+  <a href="LeDucVuong.pdf"><img src=".github/readme/report.png" width="205" alt="Read the final report"></a>
+  <a href="notebook_evidence.md"><img src=".github/readme/evidence.png" width="326" alt="Inspect the notebook evidence map"></a>
+  <a href="#reproduce-the-project"><img src=".github/readme/setup.png" width="189" alt="Set up the project"></a>
+</p>
 
-![Pipeline diagram showing the FDIC source, Bronze and Silver panels, feature construction, and frozen model evaluation](figures/pipeline_architecture.png)
+<p align="center">
+<a href="#1-acquisition-and-storage">Acquisition</a> &nbsp;·&nbsp; <a href="#2-panel-quality-labels-and-timing">Panel quality</a> &nbsp;·&nbsp; <a href="#3-processing-and-engine-benchmark">Processing</a> &nbsp;·&nbsp; <a href="#4-feature-engineering-and-model-inputs">Features</a> &nbsp;·&nbsp; <a href="#5-development-threshold-transfer-and-frozen-evaluation">Evaluation</a>
+</p>
+
+<p align="center">
+  <img src="figures/pipeline_architecture.png" alt="Pipeline diagram showing the FDIC source, Bronze and Silver panels, feature construction, and frozen model evaluation" width="760">
+</p>
 
 *The five notebooks trace the pipeline from a literature-backed field contract through acquisition, label construction, feature engineering, and evaluation. Keyed handoffs record the inputs, checks, and outputs of each phase.*
+
+---
 
 ## 1. Acquisition and storage
 
@@ -32,7 +44,9 @@ Phase 3 computes matched ratios and trailing features with pandas, Polars, and l
 | pandas | 155.20 ms |
 | PySpark local | 1,686.02 ms |
 
-![Matched 2024 W1 runtime comparison across Polars, pandas, and local PySpark](figures/engine_benchmark.png)
+<p align="center">
+  <img src="figures/engine_benchmark.png" alt="Matched 2024 W1 runtime comparison across Polars, pandas, and local PySpark" width="720">
+</p>
 
 *Polars selects 11 of 141 columns for the narrow scan. The report also benchmarks wider reductions and full-history workloads. Local Spark timings cover a laptop workload. A scale-out decision needs a matched test that includes startup, data movement, spill, and writes.*
 
@@ -54,7 +68,9 @@ Under a Top 1% review budget, Top 40 covered **164 of 194** positive banks in F1
 
 Phase 5 compares logistic regression, the frozen LightGBM incumbent, and RF variants. Four expanding development folds use a full-year purge to separate fitting from validation. The selected RF uses five-year recency weighting, 60 trees, a maximum depth of 18, a minimum leaf size of 25, and balanced bootstrap class weights. The final RF is refitted on 1985–2006 TRAIN before scoring Crisis (2008–2012) and Recent OOT (2014Q1–2025Q2).
 
-![Paired validation bootstrap distributions for average precision, bank recall, bank detections, and false alerts](figures/validation_bootstrap.png)
+<p align="center">
+  <img src="figures/validation_bootstrap.png" alt="Paired validation bootstrap distributions for average precision, bank recall, bank detections, and false alerts" width="760">
+</p>
 
 *The paired four-quarter moving-block bootstrap uses 2,000 replicates of saved out-of-fold predictions. At Top 25, recency weighting gains 15 bank–folds over fixed RF T2. The observed bank recall gain is 0.952 percentage points, with a 95% percentile interval of 0.386 to 1.228 points. The false-alert reduction interval spans zero.*
 
@@ -71,13 +87,17 @@ Phase 5 compares logistic regression, the frozen LightGBM incumbent, and RF vari
 | Recent OOT | LightGBM Top 40 | 0.31188 | 41 / 53 | 77.36% | 1,036 |
 | Recent OOT | Recency-weighted RF | 0.37201 | 44 / 53 | 83.02% | 1,031 |
 
-![Detected banks and false alerts by quarterly review budget in Crisis and Recent OOT](figures/review_capacity.png)
+<p align="center">
+  <img src="figures/review_capacity.png" alt="Detected banks and false alerts by quarterly review budget in Crisis and Recent OOT" width="760">
+</p>
 
 *Moving from 25 to 35 reviews per quarter catches 52 additional banks in Crisis and adds 60 false alerts. In Recent OOT the same expansion adds 453 false alerts while coverage stays at 44 of 53.*
 
 **Risk scores and probabilities.** Recent OOT isotonic calibration reduces Brier loss from **0.002080 to 0.000786**, while AP falls from **0.372012 to 0.336548**. The retrospective constant-prevalence benchmark has Brier loss **0.000701**. The review queue uses raw scores. Probability use needs further evidence and a benchmark appropriate to the deployment population.
 
 **Implications for Vietnam.** A domestic pilot would need stable institution IDs, comparable capital and nonperforming-loan measures, publication timestamps, and a local event definition covering failures and competing resolutions. A chronological backtest can measure how many distinct banks a fixed quarterly queue finds, when each first alert occurs, and what additional reviews cost. Calibration and the benefit of earlier detection should be estimated locally.
+
+---
 
 ## Reproduce the project
 
@@ -130,6 +150,8 @@ pandoc LeDucVuong.md --standalone --from markdown+raw_tex --to latex \
 [Figure assets](figures/) are supplied as PDF and PNG. `python generate_figures.py` rebuilds them from the recorded evidence, including the saved bootstrap histograms. `python verify_cost_grid.py` checks the development cost scenarios without fitting a model. The full report cites the literature, source data, and cost inputs. The [source-screening record](source_screening.md) explains which research informed the modelling choices.
 
 This is a National Economics University BFT65B final examination project.
+
+---
 
 ## AI use
 
