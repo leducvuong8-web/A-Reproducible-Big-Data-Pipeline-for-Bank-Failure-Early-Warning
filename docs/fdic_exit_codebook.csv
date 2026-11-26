@@ -1,0 +1,11 @@
+﻿change_code,description,verification_status
+211,Failure - Whole Institution,VERIFIED
+213,Merger - Assisted,VERIFIED
+217,Passthrough Receivorship/Conservatorship Resolution,VERIFIED
+221,Absorbtion - Without Assistance,VERIFIED
+222,Consolidated - Without Assistance,VERIFIED
+223,Merger -Without Assistance,VERIFIED
+224,Affiliated Institution Merger (Pooling) (i.e. Corporate Reorganization,VERIFIED
+230,Closing - Failure Payoff,VERIFIED
+235,"Rtc Supervised Payoffs, Liquidations, and Closings",VERIFIED
+240,Closing - Voluntary,VERIFIED

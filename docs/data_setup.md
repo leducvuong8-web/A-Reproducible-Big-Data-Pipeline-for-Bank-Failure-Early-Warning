@@ -4,14 +4,14 @@
 
 Use the Python 3.13 environment and hash-pinned dependencies in the [project README](../README.md). Run from the repository root or its `notebooks/` directory. Before Phase 0, create `data/` at the repository root. Git does not track that directory, so it does not appear in a fresh checkout.
 
-The submitted [research matrix](research_matrix.csv) contains 26 studies and is already tracked. Place any retained schema and codebook files in `docs/` alongside that matrix.
+The submitted [research matrix](research_matrix.csv) contains 26 studies. The submitted FDIC schemas, financial-schema checksum, data dictionary, and exit-code lookup are in `docs/` alongside that matrix.
 
 | File | Role |
 |:--|:--|
-| `fdic_financial_schema.yaml` and `fdic_financial_schema.yaml.meta.json` | Phase 0 verifies the URL and SHA-256 together before reusing the cached schema. Phase 1 verifies the schema against the Phase 0 handoff. Keep both from the same snapshot. |
-| `data_dictionary.csv` | Phase 0 generates and refines this dictionary. A complete Phase 0 run rewrites it. |
-| `fdic_exit_codebook.csv` | Phase 0 can reuse this cache of exit-code definitions. If absent, it queries FDIC History. |
-| `fdic_failure_schema.yaml` and `fdic_institution_schema.yaml` | Reference definitions for the failures and institutions endpoints. The notebooks do not load these two YAML files by name. |
+| [fdic_financial_schema.yaml](fdic_financial_schema.yaml) and its [checksum metadata](fdic_financial_schema.yaml.meta.json) | Phase 0 verifies the URL and SHA-256 together before reusing the cached schema. Phase 1 verifies the schema against the Phase 0 handoff. Keep both from the same snapshot. |
+| [data_dictionary.csv](data_dictionary.csv) | Phase 0 generates and refines this dictionary. A complete Phase 0 run rewrites it. |
+| [fdic_exit_codebook.csv](fdic_exit_codebook.csv) | Phase 0 can reuse this cache of exit-code definitions. If absent, it queries FDIC History. |
+| [fdic_failure_schema.yaml](fdic_failure_schema.yaml) and [fdic_institution_schema.yaml](fdic_institution_schema.yaml) | Reference definitions for the failures and institutions endpoints. The notebooks do not load these two YAML files by name. |
 
 The notebooks acquire public records from the FDIC BankFind financials, failures, institutions, and history endpoints. The schema and dictionary files describe those records. The raw snapshots and derived Parquet files are kept locally. [FDIC API documentation](https://api.fdic.gov/banks/docs/)
 
@@ -34,4 +34,6 @@ The four-quarter Phase 1 pilot (`RUN_SCOPE='pilot'`) is useful for a download sm
 
 For a fresh rebuild, start at Phase 0 and let each phase produce its own data, manifests and digests. FDIC can revise source records. If an input digest or coverage gate fails, identify the matching snapshot or regenerate downstream artifacts from the verified source.
 
-To reproduce the reported release without downloading the full history, retain one complete project archive with the original `docs/`, `data/` and `outputs/` directories and their hierarchy. The first useful checkpoint is the Phase 0/1 bundle, including the same-run Bronze and FDIC reference snapshots. To start at Phase 3 or 4, the archive must also contain the corresponding Silver, V3 and W1 artifacts. A standalone Parquet without its linked manifests does not let the later phases verify lineage.
+To reproduce the reported release without downloading the full history, keep the original `docs/`, `data/` and `outputs/` directories in the same local project. If you update the code, keep the exact original versions of the files pinned by its manifests. A fresh Phase 0 run can produce a different field contract, so run a fresh acquisition in a separate checkout. The first useful checkpoint is the Phase 0/1 bundle, including the same-run Bronze and FDIC reference snapshots. To start at Phase 3 or 4, the archive must also contain the corresponding Silver, V3 and W1 artifacts. A standalone Parquet without its linked manifests does not let the later phases verify lineage.
+
+For remote troubleshooting of a local run, share the first failing cell and its traceback. The Phase 0 artifact manifest and the handoff JSON from the phase immediately before the failure can help identify the required paths and hashes. Large Parquet files can stay on your machine.
